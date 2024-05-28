@@ -1,30 +1,60 @@
 <template>
-    <div id="app">
-      <HeaderBar />
-      <UploadComponent />
+  <div id="app">
+    <HeaderBar class="header-bar" />
+    <div class="panel">
+      <Projectlist class="project-list" />
+      <UploadComponent class="upload-component" />
     </div>
-    
-  </template>
-  
-  <script>
-  import HeaderBar from './components/HeaderBar.vue'
-  import UploadComponent from './components/Upload.vue'
+  </div>
+</template>
+<script>
+import HeaderBar from './components/HeaderBar.vue'
+import UploadComponent from './components/Upload.vue'
+import Projectlist from './components/Projectlist.vue'
 
-  export default {
-    name: 'App',
-    components: {
-      HeaderBar,
-      UploadComponent
-    }
+export default {
+  name: 'App',
+  components: {
+    HeaderBar,
+    UploadComponent,
+    Projectlist
   }
-  </script>
-  
-  <style>
-  
-  #app {
-    display: flex;
-    flex-direction: column;    
-  }
+}
+</script>
 
-  </style>
+<style>
+
+
+#app {
+  position: absolute;
+  top:6%;
+  height:94%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-bar {
+  flex-shrink: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex-grow: 1;
+  height: 220%;
+}
+
+.project-list {
+  position: absolute;
+  left: 0;
   
+}
+
+.upload-component {
+  position: absolute;
+  right: 0;
+  flex-grow: 1;
+}
+</style>

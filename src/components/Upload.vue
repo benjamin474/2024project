@@ -5,7 +5,7 @@
                 <h2 class="main-subheader">幾秒內輕鬆轉換為PDF及反向轉換。</h2>
                 <div class="dashes">
                   <div class="brand-btn-container brand-color">
-                    <a class="btn-wrapper upload-btn" @click="selectFile">
+                    <a class="btn-wrapper upload-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none">
                         <path fill="#fff" fill-rule="evenodd" d="M5.6.6c-.7 0-1.3.5-1.3 1.2v2.5H1.8a1.3 1.3 0 000 2.5h2.5v2.5a1.3 1.3 0 102.5 0V6.8h2.5a1.2 1.2 0 100-2.5H6.8V1.8c0-.7-.5-1.2-1.2-1.2z" clip-rule="evenodd"></path>
                       </svg>
@@ -37,9 +37,7 @@
       };
     },
     methods: {
-      selectFile() {
-        this.$refs.fileInput.click();
-      },
+
       handleFiles(event) {
         this.files = Array.from(event.target.files);
         // Handle the files as needed
@@ -70,7 +68,7 @@
   <style scoped>
 .layout-container {
   position: relative;
-  top: -150px;
+  /* top: -150px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,10 +111,6 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-}
-
-.button-icon {
-  margin-right: 10px;
 }
 
 .file-upload-input {
