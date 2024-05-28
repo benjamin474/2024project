@@ -28,8 +28,8 @@ export default {
 #app {
   position: absolute;
   top:6%;
-  height:95%;
-  width: 100%;
+  height:94%;
+  width: 99.5%;
   display: flex;
   flex-direction: column;
   text-align: center;

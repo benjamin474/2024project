@@ -1,9 +1,14 @@
 <template>
   <div class="header-bar">
-    <div class="title">Data Analysis</div>
+    <div class="title">
+      <img src="/src/assets/icon.jpg"  
+      width="40"
+    height="40" />
+      Data Analysis
+    </div>
     <div class="auth-buttons">
       <button @click="login">登入</button>
-      <button @click="register">註冊</button>
+      <button class="sign" @click="register">註冊</button>
     </div>
     
   </div>
@@ -50,7 +55,7 @@ export default {
 }
 
 .auth-buttons button {
-  margin-right: 10px;
+  margin-right: 5px;
   margin-left: 10px;
   padding: 10px 20px;
   background-color: #fff;
@@ -58,9 +63,23 @@ export default {
   border: none;
   cursor: pointer;
 }
-
+.auth-buttons .sign {
+  margin-right: 10px;
+  margin-left: 10px;
+  padding: 10px 20px;
+  color: #e74c3c;
+  border: 2px solid;
+  border-radius: 100px;
+  background-color: #fff;
+  transition: all 150ms linear !important;
+}
 .auth-buttons button:hover {
-  background-color: #ddd;
+  color: #ccc;
+}
+.auth-buttons .sign:hover {
+  background-color: #000000;
+  border: 2px solid;
+  color: #fff;
 }
 </style>
 s
