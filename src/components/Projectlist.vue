@@ -3,7 +3,7 @@
       <ul>
         <li v-for="(project, index) in projects" :key="index">{{ project.name }}</li>
       </ul>
-      <button @click="addProject">增加项目</button>
+      <button @click="addProject">增加新的Project</button>
     </div>
   </template>
   
@@ -12,15 +12,15 @@
     data() {
       return {
         projects: [
-          { name: "项目 1" },
-          { name: "项目 2" },
-          { name: "项目 3" }
+          { name: "Project 1" },
+          { name: "Project 2" },
+          { name: "Project 3" }
         ]
       };
     },
     methods: {
       addProject() {
-        const newProjectName = prompt("输入新项目的名称:");
+        const newProjectName = prompt("輸入新的Project name");
         if (newProjectName) {
           this.projects.push({ name: newProjectName });
         }

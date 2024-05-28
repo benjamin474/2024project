@@ -28,6 +28,7 @@ export default {
 <style scoped>
 .header-bar {
   width: 100%;
+  height: 5%;
   border-bottom:1px  solid silver;
   border-left: 1px  solid silver;
   border-right:1px  solid silver;

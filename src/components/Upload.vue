@@ -2,7 +2,7 @@
     <div class="layout-container work-area-wrapper">
             <section>
               <label class="upload-area">
-                <h2 class="main-subheader">幾秒內輕鬆轉換為PDF及反向轉換。</h2>
+                <h2 class="main-subheader">上傳你需要解析的論文</h2>
                 <div class="dashes">
                   <div class="brand-btn-container brand-color">
                     <a class="btn-wrapper upload-btn">

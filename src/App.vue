@@ -28,10 +28,11 @@ export default {
 #app {
   position: absolute;
   top:6%;
-  height:94%;
+  height:95%;
   width: 100%;
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 
 .header-bar {
@@ -43,13 +44,12 @@ export default {
   flex-direction: row;
   width: 100%;
   flex-grow: 1;
-  height: 220%;
 }
 
 .project-list {
   position: absolute;
   left: 0;
-  
+  z-index: 3;
 }
 
 .upload-component {
