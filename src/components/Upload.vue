@@ -12,7 +12,7 @@
               <span class="btn-label">選擇檔案</span>
             </a>
           </div>
-          <input class="file-upload-input" type="file" multiple @change="handleFiles" ref="fileInput">
+          <input class="file-upload-input" type="file" multiple @change="handleFiles" ref="fileInput" accept=".txt">
         </div>
       </label>
       <div class="file-list">
@@ -40,6 +40,33 @@ export default {
     handleFiles(event) {
       this.files = Array.from(event.target.files);
       console.log(this.files);
+      let filesData = new Array();
+      for (const file of this.files) {
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          
+        };
+        reader.readAsText(file);
+
+        filesData.push({ name: file.name, content: "e.target.result" });
+      }
+      let f = JSON.stringify(filesData)
+      console.log(filesData,f)
+      const data = {
+        email: "eric920807@gmail.com",  // 替換為實際的用戶郵箱
+        password: "{\"iv\": \"c53940f67946659dcff263d00c412bd1\", \"auth_tag\": \"540978d77f374280cbba8cfcd5d9b5d1\", \"data\": \"3ecd2cd2b455e157dfd9531a\"}",  // 替換為實際的用戶密碼
+        workspace: "test1",  // 設置為文件集的名稱或標識符
+        files: filesData
+      };
+
+      const response = fetch('https://wos-data-analysis-backend.onrender.com/api/file/upload', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+      });
     },
     convertFiles() {
       if (this.files.length > 0) {
