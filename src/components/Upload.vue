@@ -59,8 +59,8 @@ export default {
       if (this.filesData && this.filesData.length === this.files.length) {
         // 構建數據對象
         const data = {
-          email: "eric920807@gmail.com",  // 替換為實際的用戶郵箱 
-          password: "{\"iv\": \"c53940f67946659dcff263d00c412bd1\", \"auth_tag\": \"540978d77f374280cbba8cfcd5d9b5d1\", \"data\": \"3ecd2cd2b455e157dfd9531a\"}",  // 替換為實際的用戶密碼
+          email: localStorage.getItem('email'),
+          password: localStorage.getItem('password'),
           workspace: "test1",  // 設置為文件集的名稱或標識符
           files: this.filesData
         };
