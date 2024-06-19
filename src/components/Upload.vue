@@ -39,7 +39,7 @@ export default {
   methods: {
   handleFiles(event) {
     this.files = Array.from(event.target.files);
-    console.log(this.files);
+    // console.log(this.files);
     let filesData = [];
 
     this.files.forEach(file => {
@@ -48,7 +48,7 @@ export default {
         filesData.push({ name: file.name, content: e.target.result });
         if (filesData.length === this.files.length) {
           this.filesData = filesData;
-          console.log(filesData);
+          // console.log(filesData);
         }
       };
       reader.readAsText(file);
@@ -64,7 +64,7 @@ export default {
           workspace: "test1",  // 設置為文件集的名稱或標識符
           files: this.filesData
         };
-        console.log(JSON.stringify(data))
+        // console.log(JSON.stringify(data))
         // 發送 API 請求
         try {
           const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/file/upload', {
