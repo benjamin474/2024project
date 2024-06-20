@@ -2,8 +2,8 @@
   <div id="app">
     <HeaderBar class="header-bar" />
     <div class="panel">
-      <Projectlist class="project-list" />
-      <UploadComponent class="upload-component" />
+      <Projectlist  @select-project="setSelectedProject" />
+      <component :is="selectedComponent" />
     </div>
   </div>
 </template>
@@ -11,13 +11,33 @@
 import HeaderBar from './components/HeaderBar.vue'
 import UploadComponent from './components/Upload.vue'
 import Projectlist from './components/Projectlist.vue'
+import AdvancedSearch  from './components/AdvancedSearch.vue'
 
 export default {
   name: 'App',
   components: {
     HeaderBar,
     UploadComponent,
-    Projectlist
+    Projectlist,
+    AdvancedSearch 
+  },
+  data() {
+    return {
+      selectedProject: null
+    };
+  },
+  computed: {
+    selectedComponent() {
+      if (this.selectedProject) {
+        return this.selectedProject.files === 0 ? 'UploadComponent' : 'AdvancedSearch';
+      }
+      return null;
+    }
+  },
+  methods: {
+    setSelectedProject(project) {
+      this.selectedProject = project;
+    }
   }
 }
 </script>
@@ -46,15 +66,4 @@ export default {
   flex-grow: 1;
 }
 
-.project-list {
-  position: absolute;
-  left: 0;
-  z-index: 3;
-}
-
-.upload-component {
-  position: absolute;
-  right: 0;
-  flex-grow: 1;
-}
 </style>

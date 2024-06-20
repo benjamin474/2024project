@@ -30,6 +30,7 @@
 
 <script>
 export default {
+  name: 'UploadComponent',
   data() {
     return {
       zoomLevel: 2,
