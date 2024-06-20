@@ -34,68 +34,65 @@ export default {
   data() {
     return {
       zoomLevel: 2,
-      files: []
+      files: [],
+      filesData: []
     };
   },
   methods: {
-  handleFiles(event) {
-    this.files = Array.from(event.target.files);
-    // console.log(this.files);
-    let filesData = [];
+    handleFiles(event) {
+      this.files = Array.from(event.target.files);
+      let filesData = [];
 
-    this.files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        filesData.push({ name: file.name, content: e.target.result });
-        if (filesData.length === this.files.length) {
-          this.filesData = filesData;
-          // console.log(filesData);
-        }
-      };
-      reader.readAsText(file);
-    });
-  },
-  async convertFiles() {
-    if (this.files && this.files.length > 0) {
-      if (this.filesData && this.filesData.length === this.files.length) {
-        // 構建數據對象
-        const data = {
-          email: localStorage.getItem('email'),
-          password: localStorage.getItem('password'),
-          workspace: "test1",  // 設置為文件集的名稱或標識符
-          files: this.filesData
-        };
-        // console.log(JSON.stringify(data))
-        // 發送 API 請求
-        try {
-          const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/file/upload', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('文件上傳成功：', result);
-            alert('文件上傳成功');
-          } else {
-            console.error('文件上傳失敗', response.statusText);
-            alert('文件上傳失敗');
+      this.files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          filesData.push({ name: file.name, content: e.target.result });
+          if (filesData.length === this.files.length) {
+            this.filesData = filesData;
           }
-        } catch (error) {
-          console.error('請求失敗', error);
-          alert('請求失敗');
+        };
+        reader.readAsText(file);
+      });
+    },
+    async convertFiles() {
+      if (this.files && this.files.length > 0) {
+        if (this.filesData && this.filesData.length === this.files.length) {
+          const data = {
+            email: localStorage.getItem('email'),
+            password: localStorage.getItem('password'),
+            workspace: "test1",
+            files: this.filesData
+          };
+
+          try {
+            const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/file/upload', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log('文件上傳成功：', result);
+              alert('文件上傳成功');
+            } else {
+              console.error('文件上傳失敗', response.statusText);
+              alert('文件上傳失敗');
+            }
+          } catch (error) {
+            console.error('請求失敗', error);
+            alert('請求失敗');
+          }
+        } else {
+          alert("文件尚未全部讀取完成，請稍後再試");
         }
       } else {
-        alert("文件尚未全部讀取完成，請稍後再試");
+        alert("請先上傳文件");
       }
-    } else {
-      alert("請先上傳文件");
     }
   }
-}
 };
 </script>
 
@@ -109,11 +106,6 @@ export default {
 
 .work-area-wrapper {
   width: 100%;
-}
-
-.zoom-slider {
-  display: flex;
-  align-items: center;
 }
 
 .upload-area {
@@ -169,13 +161,14 @@ export default {
 
 .action-buttons button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: black;
   color: white;
   border: none;
   cursor: pointer;
+  border-radius: 15px;
 }
 
 .action-buttons button:hover {
-  background-color: #0056b3;
+  background-color: #ddd;
 }
 </style>
