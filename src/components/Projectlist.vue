@@ -2,14 +2,12 @@
   <div :class="{ collapsed: isCollapsed }">
     <div class="project-list">
       <ul v-if="!isCollapsed">
-        <li
-          v-for="(project, index) in projects"
-          :key="index"
-          @click="selectProject(project)"
-        >
+        <li v-for="(project, index) in projects" :key="index">
           <ProjectItem
             :class="{ active: selectedProject === project }"
             :project="project"
+            @click="selectProject(project)"
+            @delete-project="confirmDeleteProject"
           />
         </li>
       </ul>
@@ -22,7 +20,7 @@
       </div>
     </div>
 
-    <!-- 懸浮框 -->
+    <!-- 新增工作區的懸浮框 -->
     <div v-if="showModal" class="modal">
       <div class="modal-content">
         <span class="close" @click="closeAddProjectModal">&times;</span>
@@ -34,6 +32,16 @@
           placeholder="輸入新的Project名稱"
         />
         <button @click="addProject">增加</button>
+      </div>
+    </div>
+
+    <!-- 刪除確認提示框 -->
+    <div v-if="isDeleteModalVisible" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="hideDeleteModal">&times;</span>
+        <h2>確定刪除工作區 "{{ projectToDelete }}" 嗎？</h2>
+        <button @click="deleteProject">確認</button>
+        <button @click="hideDeleteModal">取消</button>
       </div>
     </div>
   </div>
@@ -53,6 +61,8 @@ export default {
       selectedProject: null,
       showModal: false,
       newProjectName: "",
+      isDeleteModalVisible: false,
+      projectToDelete: "",
     };
   },
   async mounted() {
@@ -120,9 +130,9 @@ export default {
 
           if (response.ok) {
             const result = await response.json();
-            this.projects.push({ name: result.name, files: 0 });
-            this.closeAddProjectModal();
             alert("工作區新增成功");
+            this.closeAddProjectModal();
+            await this.fetchWorkspaces(); // 调用fetchWorkspaces以刷新工作区列表
           } else {
             console.error("新增工作區失敗", response.statusText);
             alert("新增工作區失敗");
@@ -170,6 +180,49 @@ export default {
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
     },
+    confirmDeleteProject(projectName) {
+      this.projectToDelete = projectName;
+      this.isDeleteModalVisible = true;
+    },
+    hideDeleteModal() {
+      this.isDeleteModalVisible = false;
+    },
+    async deleteProject() {
+      const data = {
+        email: localStorage.getItem("email"),
+        password: localStorage.getItem("password"),
+        workspace: this.projectToDelete,
+      };
+
+      try {
+        const response = await fetch(
+          "https://wos-data-analysis-backend.onrender.com/api/file/deleteWorkspace",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(`工作區刪除成功: ${result.message}`);
+          this.projects = this.projects.filter(
+            (project) => project.name !== this.projectToDelete
+          );
+          this.$emit("delete-success");
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        alert(`刪除失敗: ${error.message}`);
+      } finally {
+        this.hideDeleteModal();
+      }
+    },
   },
 };
 </script>
@@ -199,6 +252,7 @@ li {
   padding: 10px;
   border-bottom: 1px solid #ddd;
   border-radius: 10px;
+  position: relative;
 }
 
 li:hover {
@@ -221,17 +275,33 @@ button:hover {
   background-color: #555;
 }
 
+.delete-button {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
 .toggle-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 10px;
+  width: 20px;
   height: 40px;
   background-color: #333;
   color: white;
   cursor: pointer;
   position: absolute;
-  right: 0;
+  right: -10px;
   top: 50%;
   transform: translateY(-50%);
   transition: right 0.3s;
@@ -246,7 +316,6 @@ button:hover {
 .collapsed .project-list {
   width: 20px;
   overflow: hidden;
-  border-radius: 10px;
 }
 
 .collapsed ul,

@@ -143,6 +143,7 @@ export default {
           localStorage.setItem("password", result.password);
 
           this.hideModal();
+          window.location.reload(); // 重新整理頁面
         } else {
           throw new Error(result.message);
         }
@@ -155,6 +156,7 @@ export default {
       localStorage.removeItem("email");
       localStorage.removeItem("password");
       alert("已登出");
+      window.location.reload(); // 重新整理頁面
     },
   },
 };

@@ -4,6 +4,12 @@
     <ul class="files">
       <li v-for="file in files" :key="file.name">
         <a :href="file.url" target="_blank">{{ file.name }}</a>
+        <input
+          type="checkbox"
+          v-if="deleteMode"
+          v-model="selectedFiles"
+          :value="file.name"
+        />
       </li>
     </ul>
     <div class="upload-section">
@@ -12,8 +18,12 @@
         @change="handleFileUpload"
         ref="fileInput"
         style="display: none"
+        multiple
       />
-      <button @click="triggerFileInput">上傳檔案</button>
+      <button @click="deleteMode ? confirmDelete() : triggerFileInput()">
+        {{ deleteMode ? "確認" : "上傳檔案" }}
+      </button>
+      <button @click="toggleDeleteMode">刪除</button>
     </div>
   </div>
 </template>
@@ -32,6 +42,12 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      deleteMode: false,
+      selectedFiles: [],
+    };
+  },
   methods: {
     triggerFileInput() {
       this.$refs.fileInput.click();
@@ -39,6 +55,18 @@ export default {
     async handleFileUpload(event) {
       const files = Array.from(event.target.files);
       if (files.length === 0) return;
+
+      // 檢查是否有重複文件
+      const existingFileNames = this.files.map((file) => file.name);
+      const duplicateFiles = files.filter((file) =>
+        existingFileNames.includes(file.name)
+      );
+      if (duplicateFiles.length > 0) {
+        alert(
+          `檔案重複: ${duplicateFiles.map((file) => file.name).join(", ")}`
+        );
+        return;
+      }
 
       const filesData = [];
       for (const file of files) {
@@ -85,6 +113,46 @@ export default {
         console.error("請求失敗", error);
         alert("請求失敗");
       }
+    },
+    toggleDeleteMode() {
+      this.deleteMode = !this.deleteMode;
+      this.selectedFiles = [];
+    },
+    async confirmDelete() {
+      const data = {
+        email: localStorage.getItem("email"),
+        password: localStorage.getItem("password"),
+        workspace: this.project.name,
+        files: this.selectedFiles,
+      };
+
+      try {
+        const response = await fetch(
+          "https://wos-data-analysis-backend.onrender.com/api/file/deleteFiles",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("文件刪除成功：", result);
+          alert("文件刪除成功");
+          this.$emit("upload-success");
+        } else {
+          console.error("文件刪除失敗", response.statusText);
+          alert("文件刪除失敗");
+        }
+      } catch (error) {
+        console.error("請求失敗", error);
+        alert("請求失敗");
+      }
+
+      this.toggleDeleteMode();
     },
   },
 };
@@ -139,7 +207,7 @@ a:hover {
 
 .upload-section {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 10px;
 }
 
