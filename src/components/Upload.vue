@@ -6,13 +6,30 @@
         <div class="dashes">
           <div class="brand-btn-container brand-color">
             <a class="btn-wrapper upload-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none">
-                <path fill="#fff" fill-rule="evenodd" d="M5.6.6c-.7 0-1.3.5-1.3 1.2v2.5H1.8a1.3 1.3 0 000 2.5h2.5v2.5a1.3 1.3 0 102.5 0V6.8h2.5a1.2 1.2 0 100-2.5H6.8V1.8c0-.7-.5-1.2-1.2-1.2z" clip-rule="evenodd"></path>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                fill="none"
+              >
+                <path
+                  fill="#fff"
+                  fill-rule="evenodd"
+                  d="M5.6.6c-.7 0-1.3.5-1.3 1.2v2.5H1.8a1.3 1.3 0 000 2.5h2.5v2.5a1.3 1.3 0 102.5 0V6.8h2.5a1.2 1.2 0 100-2.5H6.8V1.8c0-.7-.5-1.2-1.2-1.2z"
+                  clip-rule="evenodd"
+                ></path>
               </svg>
               <span class="btn-label">選擇檔案</span>
             </a>
           </div>
-          <input class="file-upload-input" type="file" multiple @change="handleFiles" ref="fileInput" accept=".txt">
+          <input
+            class="file-upload-input"
+            type="file"
+            multiple
+            @change="handleFiles"
+            ref="fileInput"
+            accept=".txt"
+          />
         </div>
       </label>
       <div class="file-list">
@@ -30,20 +47,23 @@
 
 <script>
 export default {
-  name: 'UploadComponent',
+  props: {
+    project: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
-      zoomLevel: 2,
       files: [],
-      filesData: []
+      filesData: [],
     };
   },
   methods: {
     handleFiles(event) {
       this.files = Array.from(event.target.files);
       let filesData = [];
-
-      this.files.forEach(file => {
+      this.files.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           filesData.push({ name: file.name, content: e.target.result });
@@ -58,32 +78,36 @@ export default {
       if (this.files && this.files.length > 0) {
         if (this.filesData && this.filesData.length === this.files.length) {
           const data = {
-            email: localStorage.getItem('email'),
-            password: localStorage.getItem('password'),
-            workspace: "test1",
-            files: this.filesData
+            email: localStorage.getItem("email"),
+            password: localStorage.getItem("password"),
+            workspace: this.project.name,
+            files: this.filesData,
           };
 
           try {
-            const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/file/upload', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-            });
+            const response = await fetch(
+              "https://wos-data-analysis-backend.onrender.com/api/file/upload",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              }
+            );
 
             if (response.ok) {
               const result = await response.json();
-              console.log('文件上傳成功：', result);
-              alert('文件上傳成功');
+              console.log("文件上傳成功：", result);
+              alert("文件上傳成功");
+              this.$emit("upload-success"); // 通知父组件上传成功
             } else {
-              console.error('文件上傳失敗', response.statusText);
-              alert('文件上傳失敗');
+              console.error("文件上傳失敗", response.statusText);
+              alert("文件上傳失敗");
             }
           } catch (error) {
-            console.error('請求失敗', error);
-            alert('請求失敗');
+            console.error("請求失敗", error);
+            alert("請求失敗");
           }
         } else {
           alert("文件尚未全部讀取完成，請稍後再試");
@@ -91,10 +115,12 @@ export default {
       } else {
         alert("請先上傳文件");
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
+
 
 <style scoped>
 .layout-container {
@@ -116,15 +142,15 @@ export default {
 
 .dashes {
   width: 300px;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   background: rgb(156, 153, 153);
-  border-radius: 15px; 
+  border-radius: 15px;
   padding: 30px;
   text-align: center;
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-label {

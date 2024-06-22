@@ -2,11 +2,20 @@
   <div :class="{ collapsed: isCollapsed }">
     <div class="project-list">
       <ul v-if="!isCollapsed">
-        <li v-for="(project, index) in projects" :key="index" @click="selectProject(project)">
-          <ProjectItem :class="{ 'active': selectedProject === project }" :project="project" />
+        <li
+          v-for="(project, index) in projects"
+          :key="index"
+          @click="selectProject(project)"
+        >
+          <ProjectItem
+            :class="{ active: selectedProject === project }"
+            :project="project"
+          />
         </li>
       </ul>
-      <button v-if="!isCollapsed" @click="showAddProjectModal">增加新的Project</button>
+      <button v-if="!isCollapsed" @click="showAddProjectModal">
+        增加新的Project
+      </button>
       <div class="toggle-button" @click="toggleSidebar">
         <span v-if="isCollapsed">&gt;</span>
         <span v-else>&lt;</span>
@@ -18,7 +27,12 @@
       <div class="modal-content">
         <span class="close" @click="closeAddProjectModal">&times;</span>
         <h2>新增工作區</h2>
-        <input class="large-input" type="text" v-model="newProjectName" placeholder="輸入新的Project名稱" />
+        <input
+          class="large-input"
+          type="text"
+          v-model="newProjectName"
+          placeholder="輸入新的Project名稱"
+        />
         <button @click="addProject">增加</button>
       </div>
     </div>
@@ -26,26 +40,57 @@
 </template>
 
 <script>
-import ProjectItem from './ProjectItem.vue';
+import ProjectItem from "./ProjectItem.vue";
 
 export default {
   components: {
-    ProjectItem
+    ProjectItem,
   },
   data() {
     return {
-      projects: [
-        { name: "Project 1", files: 0 },
-        { name: "Project 2", files: 3 },
-        { name: "Project 3", files: 8 }
-      ],
+      projects: [],
       isCollapsed: false,
       selectedProject: null,
       showModal: false,
-      newProjectName: ""
+      newProjectName: "",
     };
   },
+  async mounted() {
+    await this.fetchWorkspaces();
+  },
   methods: {
+    async fetchWorkspaces() {
+      const data = {
+        email: localStorage.getItem("email"),
+        password: localStorage.getItem("password"),
+      };
+
+      try {
+        const response = await fetch(
+          "https://wos-data-analysis-backend.onrender.com/api/file/getWorkspace",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          this.projects = result.workspace.map((workspace) => ({
+            name: workspace.name,
+            files: workspace.count,
+          }));
+          console.log(this.projects);
+        } else {
+          console.error("獲取工作區失敗", response.statusText);
+        }
+      } catch (error) {
+        console.error("請求失敗", error);
+      }
+    },
     showAddProjectModal() {
       this.showModal = true;
     },
@@ -53,20 +98,79 @@ export default {
       this.showModal = false;
       this.newProjectName = "";
     },
-    addProject() {
+    async addProject() {
       if (this.newProjectName) {
-        this.projects.push({ name: this.newProjectName, files: 0 });
-        this.closeAddProjectModal();
+        const data = {
+          email: localStorage.getItem("email"),
+          password: localStorage.getItem("password"),
+          name: this.newProjectName,
+        };
+
+        try {
+          const response = await fetch(
+            "https://wos-data-analysis-backend.onrender.com/api/file/newWorkspace",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            }
+          );
+
+          if (response.ok) {
+            const result = await response.json();
+            this.projects.push({ name: result.name, files: 0 });
+            this.closeAddProjectModal();
+            alert("工作區新增成功");
+          } else {
+            console.error("新增工作區失敗", response.statusText);
+            alert("新增工作區失敗");
+          }
+        } catch (error) {
+          console.error("請求失敗", error);
+          alert("請求失敗");
+        }
       }
     },
-    selectProject(project) {
+    async selectProject(project) {
+      this.$emit("select-project", project);
       this.selectedProject = project;
-      this.$emit('select-project', project);
+
+      const data = {
+        email: localStorage.getItem("email"),
+        password: localStorage.getItem("password"),
+        workspace: project.name,
+      };
+
+      try {
+        const response = await fetch(
+          "https://wos-data-analysis-backend.onrender.com/api/file/getFolder",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          project.files = result.files.length; // 更新项目的文件数量
+          this.$emit("update-files", result.files);
+          console.log("工作區底下的檔案:", result.files);
+        } else {
+          console.error("獲取工作區檔案失敗", response.statusText);
+        }
+      } catch (error) {
+        console.error("請求失敗", error);
+      }
     },
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -127,7 +231,7 @@ button:hover {
   color: white;
   cursor: pointer;
   position: absolute;
-  right: 0; /* 將按鈕定位在右邊邊框 */
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   transition: right 0.3s;
@@ -140,7 +244,7 @@ button:hover {
 }
 
 .collapsed .project-list {
-  width: 20px; /* 調整為最小寬度以顯示切換按鈕 */
+  width: 20px;
   overflow: hidden;
   border-radius: 10px;
 }
@@ -151,7 +255,7 @@ button:hover {
 }
 
 .collapsed .toggle-button {
-  right: 0; /* 隱藏側邊欄時調整位置以隱藏按鈕 */
+  right: 0;
   background-color: #555;
 }
 
@@ -160,7 +264,6 @@ button:hover {
   border-radius: 10px;
 }
 
-/* 懸浮框樣式 */
 .modal {
   display: flex;
   justify-content: center;
