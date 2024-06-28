@@ -1,3 +1,5 @@
+<!-- AdvancedSearch.vue -->
+
 <template>
   <div class="layout-container work-area-wrapper">
     <div class="section">

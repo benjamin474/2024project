@@ -1,3 +1,5 @@
+<!-- HeaderBar.vue -->
+
 <template>
   <div class="header-bar">
     <div class="title">

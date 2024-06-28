@@ -1,3 +1,5 @@
+<!-- Projectlist.vue -->
+
 <template>
   <div :class="{ collapsed: isCollapsed }">
     <div class="project-list">
@@ -240,6 +242,7 @@ export default {
   position: relative;
   background-color: #f7f7f7;
   border-radius: 10px;
+  
 }
 
 ul {

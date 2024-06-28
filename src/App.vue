@@ -1,3 +1,4 @@
+<!-- app.vue -->
 <template>
   <div id="app">
     <HeaderBar class="header-bar" />
@@ -138,9 +139,9 @@ export default {
 <style>
 #app {
   position: absolute;
-  top: 6%;
-  height: 94%;
-  width: 99.5%;
+  top: 7%;
+  height: 92%;
+  width: 99%;
   display: flex;
   flex-direction: column;
   text-align: center;
