@@ -2,8 +2,8 @@
 <!-- 控制整個page的 -->
 <div class="advance_page">  
     <!-- 搜尋功能選擇 -->
-    <div class="btn-group">
-        <input type="button" value="返回" class="btn-option"
+    <div class="btn-group" >
+        <input type="button" value="返回" class="btn-option" id="btn-back"
          @click="hidden_btn()" v-if="btn_show === false">
          
         <input type="button" value="根據年份區間做關鍵字分析" class="btn-option"
@@ -55,7 +55,7 @@
                 <input type="button" value="開始分析" @click="startAnalysis3()">
             </label>
         </div>
-
+       
         <div class="year-author search-item" v-if="search_block === 4">
             <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
             <label>
@@ -341,7 +341,7 @@
   async function drawChart1() {
       const result = await get_results();
       console.log(result)
-      const topData= result.results.slice(0,10);
+      const topData= result.results.slice(0,50);
 
       const data = new google.visualization.DataTable();
       data.addColumn('string', 'Keyword');
@@ -364,7 +364,7 @@
       const result = await get_results();
       console.log(result)
 
-      const topData= result.results.slice(0,10);
+      const topData= result.results.slice(0,50);
     //   console.log(Object.entries(topData[0]))    之後再嘗試修改
 
       const data = new google.visualization.DataTable();
@@ -394,7 +394,7 @@
   async function drawChart3() {
       const result = await get_results();
       console.log(result)
-      const topData= result.results.slice(0,10);
+      const topData= result.results.slice(0,50);
 
       const data = new google.visualization.DataTable();
       data.addColumn('string', 'author');
@@ -415,7 +415,7 @@
   async function drawChart4() {
     const result = await get_results();
     // console.log(result)
-    const topData= result.results.slice(0,100);
+    const topData= result.results.slice(0,50);
     // const topData= result.results;
 
     console.log(topData)
@@ -471,24 +471,91 @@
 </script>
 
 <style scoped>
-.advance_page{
+.advance_page {
     width: 1280px;
-    margin: 5px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
 .btn-group {
-  width: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .btn-option {
-  display: flex;
+    width: 45%;
+    background-color: #3B82F6;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-option:hover {
+    background-color: #2563EB;
+}
+
+#btn-back{
+    width: 5%;
+}
+
+.search-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-item {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-item p {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.search-item label {
+    margin-bottom: 10px;
+}
+
+.search-item input[type="number"],
+.search-item input[type="text"] {
+    padding: 5px;
+    border: 1px solid #D1D5DB;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.search-item input[type="button"] {
+    background-color: #3B82F6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-item input[type="button"]:hover {
+    background-color: #2563EB;
 }
 
 .chart-show {
-  margin-top: 20px;
+    width: 80%;
+    max-width: 1200px;
+    margin-top: 50px;
 }
 
-#chart {
-    width: 100%;
-    height: 500px;
-  }
 </style>
