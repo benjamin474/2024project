@@ -169,8 +169,9 @@ export default {
 
         if (response.ok) {
           const result = await response.json();
-          project.files = result.files.length; // 更新项目的文件数量
+          project.files = result.files.length; // 更新项目的文件数量，簡體註解改一下好不好啊
           this.$emit("update-files", result.files);
+          localStorage.setItem("file_lists",JSON.stringify(result.files)); //資料先放local,之後直接傳來
           console.log("工作區底下的檔案:", result.files);
         } else {
           console.error("獲取工作區檔案失敗", response.statusText);
