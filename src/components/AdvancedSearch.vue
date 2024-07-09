@@ -77,7 +77,7 @@
   
     <!-- 圖表直接用標籤去套css -->
     <div class="chart-show" v-if="showChart">
-        <div id="chart"></div>
+        <div id="chart" ></div>
     </div>
 </div>
   
@@ -85,6 +85,11 @@
 
 <script setup>
   import { ref } from 'vue';
+
+  const f = JSON.parse(localStorage.getItem("file_lists"))
+  console.log(f)
+  const work_file = f.map(file =>file.name)
+//   console.log(work_file)
 
   //按鈕顯示
   const btn_show = ref(true);
@@ -111,7 +116,7 @@
   }
 
   //根據年份區間做關鍵字分析
-  //未完成部分: workspace、file_list資料抓取(先用fake)， 
+  //未完成部分: workspace資料抓取(先用fake)， 
   async function startAnalysis1(){
       showChart.value = true;
       const requestData = {
@@ -120,7 +125,7 @@
           password: localStorage.getItem("password"),
           //workspace和file抓你file那個vue的，未處理完成
           workspace: "test2",
-          files: ["File1.txt", "File2.txt"],
+          files: work_file,
           start: startYear.value,
           end: endYear.value
       };
@@ -144,15 +149,15 @@
           console.error('Error fetching data:', error);
       }
 
-      //等待5秒
-      await sleep(5000);
+      //等待10秒
+      await sleep(10000);
 
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart1());
   }
 
   //根據關鍵字出現次數做分析（設定下限）
-  //未完成部分: workspace、file_list資料抓取(先用fake)， 
+  //未完成部分: workspace資料抓取(先用fake)， 
   async function startAnalysis2(){
       showChart.value = true;
       const requestData = {
@@ -160,7 +165,7 @@
           password: localStorage.getItem("password"),
           //workspace和file抓你file那個vue的，未處理完成
           workspace: "test2",
-          files: ["File1.txt", "File2.txt"],
+          files: work_file,
           threshold:lower_limit.value
       };
       try {
@@ -183,8 +188,8 @@
           console.error('Error fetching data:', error);
       }
 
-      //等待5秒
-      await sleep(5000);
+      //等待10秒
+      await sleep(10000);
 
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart1());
@@ -198,7 +203,7 @@
           password: localStorage.getItem("password"),
           //workspace和file抓你file那個vue的，未處理完成
           workspace: "test2",
-          files: ["File1.txt", "File2.txt"],
+          files: work_file,
           keyword: single_key.value
       };
       try {
@@ -222,7 +227,7 @@
       }
 
       //等待5秒
-      await sleep(5000);
+      await sleep(10000);
 
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart2());
@@ -237,7 +242,7 @@
           password: localStorage.getItem("password"),
           //workspace和file抓你file那個vue的，未處理完成
           workspace: "test2",
-          files: ["File1.txt", "File2.txt"],
+          files: work_file,
           start: startYear.value,
           end: endYear.value
       };
@@ -261,8 +266,8 @@
           console.error('Error fetching data:', error);
       }
 
-      //等待5秒
-      await sleep(5000);
+      //等待10秒
+      await sleep(10000);
 
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart3());
@@ -277,7 +282,7 @@
           password: localStorage.getItem("password"),
           //workspace和file抓你file那個vue的，未處理完成
           workspace: "test2",
-          files: ["File1.txt", "File2.txt"],
+          files: work_file,
           start: startYear.value,
           end: endYear.value
       };
@@ -301,8 +306,8 @@
           console.error('Error fetching data:', error);
       }
 
-      //等待5秒
-      await sleep(5000);
+      //等待30秒，這個超久
+      await sleep(30000);
 
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart4());
@@ -505,6 +510,7 @@
 
 #btn-back{
     width: 5%;
+    min-width: 75px;
 }
 
 .search-group {
@@ -553,9 +559,13 @@
 }
 
 .chart-show {
+    align-items: center;
     width: 80%;
     max-width: 1200px;
     margin-top: 50px;
 }
+
+
+
 
 </style>
