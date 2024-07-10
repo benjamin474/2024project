@@ -58,34 +58,6 @@ export default {
       this.selectedProject = project;
       await this.fetchFiles(project.name);
     },
-    async fetchProjects() {
-      const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-      };
-
-      try {
-        const response = await fetch(
-          "https://wos-data-analysis-backend.onrender.com/api/project/getAll",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          }
-        );
-
-        if (response.ok) {
-          const result = await response.json();
-          this.projects = result.projects;
-        } else {
-          console.error("獲取工作區失敗", response.statusText);
-        }
-      } catch (error) {
-        console.error("請求失敗", error);
-      }
-    },
     async fetchFiles(workspaceName) {
       const data = {
         email: localStorage.getItem("email"),

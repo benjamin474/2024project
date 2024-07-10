@@ -170,7 +170,7 @@ export default {
   padding: 10px;
   box-sizing: border-box;
   position: fixed;
-  top: 13%;
+  top: 17%;
   right: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;

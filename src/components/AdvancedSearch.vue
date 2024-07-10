@@ -89,7 +89,7 @@
   const f = JSON.parse(localStorage.getItem("file_lists"))
   console.log(f)
   const work_file = f.map(file =>file.name)
-//   console.log(work_file)
+  console.log(work_file)
 
   //按鈕顯示
   const btn_show = ref(true);
@@ -168,6 +168,7 @@
           files: work_file,
           threshold:lower_limit.value
       };
+
       try {
           const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/occurence', {
               method: 'POST',
