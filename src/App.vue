@@ -7,6 +7,8 @@
       <component
         :is="selectedComponent"
         :project="selectedProject"
+        :files="files"
+        :selectedWorkspace="selectedProject ? selectedProject.name : ''"
         @upload-success="refreshFiles"
       />
       <FileList
@@ -156,6 +158,8 @@ export default {
   flex-direction: row;
   width: 100%;
   flex-grow: 1;
+  justify-content: flex-start; /* 控管排列方式 */
+  align-items: flex-start
 }
 
 .file-list-container {

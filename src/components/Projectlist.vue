@@ -171,7 +171,7 @@ export default {
           const result = await response.json();
           project.files = result.files.length; // 更新项目的文件数量，簡體註解改一下好不好啊
           this.$emit("update-files", result.files);
-          localStorage.setItem("file_lists",JSON.stringify(result.files)); //資料先放local,之後直接傳來
+          // localStorage.setItem("file_lists",JSON.stringify(result.files)); //資料先放local,之後直接傳來
           console.log("工作區底下的檔案:", result.files);
         } else {
           console.error("獲取工作區檔案失敗", response.statusText);
@@ -232,7 +232,9 @@ export default {
 
 <style scoped>
 .project-list {
-  width: 250px;
+  width: 100%;
+  min-width:250px;
+  margin-top:20px;
   height: 100%;
   border-right: 1px solid #ddd;
   padding: 10px;

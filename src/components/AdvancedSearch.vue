@@ -1,3 +1,5 @@
+<!-- AdvancedSearch.vue -->
+
 <template>
     <!-- 控制整個page的 -->
     <div class="advance_page">
@@ -87,25 +89,6 @@
 <script setup>
 import { ref ,watch} from 'vue';
 import { VueSpinnerHourglass } from 'vue3-spinners';
-const props = defineProps({
-selectedWorkspace: {
-    type: String,
-    required: true
-}
-});
-
-// 在组件内部定义工作区变量，并将其值设置为从 props 传递进来的 selectedWorkspace
-const currentWorkspace = ref(props.selectedWorkspace);
-
-watch(() => props.selectedWorkspace, (newValue) => {
-    currentWorkspace.value = newValue;
-});
-
-console.log(currentWorkspace.value)
-const f = JSON.parse(localStorage.getItem("file_lists"))
-console.log(f)
-const work_file = f.map(file => file.name)
-console.log(work_file)
 
 //按鈕顯示
 const btn_show = ref(true);
@@ -122,6 +105,45 @@ const single_key = ref("");
 const showChart = ref(false);
 //等待資料回傳畫面控制
 const waitComp = ref(false);
+
+const props = defineProps({
+selectedWorkspace: {
+    type: String,
+    required: true
+},
+files: {
+    type:Array,
+    required: true
+}
+});
+
+// 在组件内部定义工作区变量，并将其值设置为从 props 传递进来的 selectedWorkspace
+const currentWorkspace = ref(props.selectedWorkspace);
+console.log(currentWorkspace.value)
+const work_file = ref(props.files.map(file => file.name))
+console.log(props.selectedWorkspace,work_file.value)
+
+//工作區變換
+watch(() => props.selectedWorkspace, (newValue) => {
+    currentWorkspace.value = newValue;
+    console.log(currentWorkspace.value)
+
+    btn_show.value = true;
+    search_block.value = 0;
+    showChart.value = false;
+});
+
+// 监听 props.files 的变化
+watch(() => props.files, (newFiles) => {
+    work_file.value = newFiles.map(file => file.name);
+
+    // 更新 localStorage 中的文件列表
+    // localStorage.setItem("file_lists", JSON.stringify(newFiles));
+
+    // 输出变化后的值
+    // console.log(f.value);
+    console.log(work_file.value);
+});
 
 const hidden_btn = () => {
     btn_show.value = !btn_show.value;
@@ -141,8 +163,8 @@ async function startAnalysis1() {
         email: localStorage.getItem("email"),
         password: localStorage.getItem("password"),
         //workspace和file抓你file那個vue的，未處理完成
-        workspace: "test2",
-        files: work_file,
+        workspace: currentWorkspace.value,
+        files: work_file.value,
         start: startYear.value,
         end: endYear.value
     };
@@ -180,8 +202,8 @@ async function startAnalysis2() {
         email: localStorage.getItem("email"),
         password: localStorage.getItem("password"),
         //workspace和file抓你file那個vue的，未處理完成
-        workspace: "test2",
-        files: work_file,
+        workspace: currentWorkspace.value,
+        files: work_file.value,
         threshold: lower_limit.value
     };
 
@@ -219,8 +241,8 @@ async function startAnalysis3() {
         email: localStorage.getItem("email"),
         password: localStorage.getItem("password"),
         //workspace和file抓你file那個vue的，未處理完成
-        workspace: "test2",
-        files: work_file,
+        workspace: currentWorkspace.value,
+        files: work_file.value,
         keyword: single_key.value
     };
     try {
@@ -258,8 +280,8 @@ async function startAnalysis4() {
         email: localStorage.getItem("email"),
         password: localStorage.getItem("password"),
         //workspace和file抓你file那個vue的，未處理完成
-        workspace: "test2",
-        files: work_file,
+        workspace: currentWorkspace.value,
+        files: work_file.value,
         start: startYear.value,
         end: endYear.value
     };
@@ -298,8 +320,8 @@ async function startAnalysis5() {
         email: localStorage.getItem("email"),
         password: localStorage.getItem("password"),
         //workspace和file抓你file那個vue的，未處理完成
-        workspace: "test2",
-        files: work_file,
+        workspace: currentWorkspace.value,
+        files: work_file.value,
         start: startYear.value,
         end: endYear.value
     };
@@ -509,18 +531,20 @@ function sleep(ms) {
 
 <style scoped>
 .advance_page {
-    width: 1280px;
+    width: 70%;
     margin-top: 50px;
+    margin-left: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
   
   .btn-group {
     width: 100%;
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
   }
   
@@ -592,9 +616,9 @@ function sleep(ms) {
   }
   
   .chart-show {
-    align-items: center;
     width: 100%;
     max-width: 1200px;
     margin-top: 10px;
+
 }
 </style>
