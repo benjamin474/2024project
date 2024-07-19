@@ -1,572 +1,514 @@
-<!-- AdvancedSearch.vue -->
-
 <template>
-    <!-- 控制整個page的 -->
-    <div class="advance_page">
-        <!-- 搜尋功能選擇 -->
-        <div class="btn-group">
-            <input type="button" value="返回" class="btn-option" id="btn-back" @click="hidden_btn()"
-                v-if="btn_show === false">
-
-            <input type="button" value="根據年份區間做關鍵字分析" class="btn-option" @click="hidden_btn(); show_search(1)"
-                v-if="btn_show === true">
-
-            <input type="button" value="根據關鍵字出現次數做分析" class="btn-option" @click="hidden_btn(); show_search(2)"
-                v-if="btn_show === true">
-
-            <input type="button" value="關鍵字成長趨勢" class="btn-option" @click="hidden_btn(); show_search(3)"
-                v-if="btn_show === true">
-
-            <input type="button" value="根據年份區間對作者分析" class="btn-option" @click="hidden_btn(); show_search(4)"
-                v-if="btn_show === true">
-
-            <!-- 因為不用輸入資料，直接分析 -->
-            <input type="button" value="根據引用次數做分析" class="btn-option"
-                @click="hidden_btn(); show_search(5); startAnalysis5()" v-if="btn_show === true">
-
-        </div>
-        <!-- 功能顯示 -->
-        <div class="search-group">
-            <div class="year-keyword search-item" v-if="search_block === 1">
-                <p>請輸入年份區間，系統會顯示該區間之關鍵字及出現次數</p>
-                <label>
-                    開始年:
-                    <input type="number" v-model="startYear" />
-                </label>
-                <label>
-                    結束年:
-                    <input type="number" v-model="endYear" />
-                </label>
-                <input type="button" value="開始分析" @click="startAnalysis1()">
-            </div>
-
-            <div class="occurence-keyword search-item" v-if="search_block === 2">
-                <p>根據關鍵字出現次數做分析，請輸入下限</p>
-                <label>
-                    最少出現次數(下限):
-                    <input type="number" v-model="lower_limit" @keyup.enter="startAnalysis2()" />
-                </label>
-                <input type="button" value="開始分析" @click="startAnalysis2()">
-            </div>
-
-            <div class="single-keyword search-item" v-if="search_block === 3">
-                <p>根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢</p>
-                <label>
-                    輸入關鍵字
-                    <input type="text" v-model="single_key" @keyup.enter="startAnalysis3()" />
-                    <input type="button" value="開始分析" @click="startAnalysis3()">
-                </label>
-            </div>
-
-            <div class="year-author search-item" v-if="search_block === 4">
-                <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
-                <label>
-                    開始年:
-                    <input type="number" v-model="startYear" />
-                </label>
-                <label>
-                    結束年:
-                    <input type="number" v-model="endYear" />
-                </label>
-                <input type="button" value="開始分析" @click="startAnalysis4()">
-            </div>
-
-            <div class="author-cite search-item" v-if="search_block === 5">
-                <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
-            </div>
-
-        </div>
-
-        <!-- 圖表直接用標籤去套css -->
-        <div class="chart-show">
-            <div id="chart" v-if="showChart"></div>
-            <VueSpinnerHourglass size="40px" color="blue" v-if="waitComp" />
-        </div>
+    <div class="advanced-search">
+    <div class="dropdown">
+      <button class="dropbtn" @click="toggleDropdown">選擇分析功能</button>
+      <div class="dropdown-content" v-show="dropdownOpen">
+        <a @click="hidden_btn(); show_search(1)">根據年份區間做關鍵字分析</a>
+        <a @click="hidden_btn(); show_search(2)">根據關鍵字出現次數做分析</a>
+        <a @click="hidden_btn(); show_search(3)">關鍵字成長趨勢</a>
+        <a @click="hidden_btn(); show_search(4)">根據年份區間對作者分析</a>
+        <a @click="hidden_btn(); show_search(5); startAnalysis5()">根據引用次數做分析</a>
+      </div>
+    </div>
+    <button class="btn-option" @click="hidden_btn()" v-if="!btn_show">返回</button>
+  
+    <div class="search-group">
+    <div class="year-keyword search-item" v-if="search_block === 1">
+      <p>請輸入年份區間，系統會顯示該區間之關鍵字及出現次數</p>
+      <label>
+        開始年:
+        <input type="number" v-model="startYear" class="small-input"/>
+      </label>
+      <label>
+        結束年:
+        <input type="number" v-model="endYear" class="small-input"/>
+      </label>
+      <input type="button" value="開始分析" @click="startAnalysis1()">
     </div>
 
-</template>
+    <div class="occurence-keyword search-item" v-if="search_block === 2">
+      <p>根據關鍵字出現次數做分析，請輸入下限</p>
+      <label>
+        最少出現次數(下限):
+        <input type="number" v-model="lower_limit" @keyup.enter="startAnalysis2()" class="small-input"/>
+      </label>
+      <input type="button" value="開始分析" @click="startAnalysis2()">
+    </div>
 
-<script setup>
-import { ref ,watch} from 'vue';
-import { VueSpinnerHourglass } from 'vue3-spinners';
+    <div class="single-keyword search-item" v-if="search_block === 3">
+      <p>根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢</p>
+      <label>
+        輸入關鍵字
+        <input type="text" v-model="single_key" @keyup.enter="startAnalysis3()" class="small-input"/>
+        <input type="button" value="開始分析" @click="startAnalysis3()">
+      </label>
+    </div>
 
-//按鈕顯示
-const btn_show = ref(true);
-//搜尋功能控制
-const search_block = ref(0);
-//年份區間控制項
-const startYear = ref(1950);
-const endYear = ref(2024);
-//出現次數作分析之下限
-const lower_limit = ref(1);
-//單一關鍵字
-const single_key = ref("");
-//圖表展示控制
-const showChart = ref(false);
-//等待資料回傳畫面控制
-const waitComp = ref(false);
+    <div class="year-author search-item" v-if="search_block === 4">
+      <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
+      <label>
+        開始年:
+        <input type="number" v-model="startYear" class="small-input"/>
+      </label>
+      <label>
+        結束年:
+        <input type="number" v-model="endYear" class="small-input"/>
+      </label>
+      <input type="button" value="開始分析" @click="startAnalysis4()">
+    </div>
 
-const props = defineProps({
-selectedWorkspace: {
-    type: String,
-    required: true
-},
-files: {
-    type:Array,
-    required: true
-}
-});
+    <div class="author-cite search-item" v-if="search_block === 5">
+      <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
+    </div>
 
-// 在组件内部定义工作区变量，并将其值设置为从 props 传递进来的 selectedWorkspace
-const currentWorkspace = ref(props.selectedWorkspace);
-console.log(currentWorkspace.value)
-const work_file = ref(props.files.map(file => file.name))
-console.log(props.selectedWorkspace,work_file.value)
+      </div>
+  
+      <div class="chart-show">
+        <div id="chart" v-if="showChart"></div>
+        <VueSpinnerHourglass size="40px" color="blue" v-if="waitComp" />
+      </div>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref, watch } from 'vue';
+  import { VueSpinnerHourglass } from 'vue3-spinners';
 
-//工作區變換
-watch(() => props.selectedWorkspace, (newValue) => {
+  const dropdownOpen = ref(false);
+  const btn_show = ref(true);
+  const search_block = ref(0);
+  const startYear = ref(1950);
+  const endYear = ref(2024);
+  const lower_limit = ref(1);
+  const single_key = ref("");
+  const showChart = ref(false);
+  const waitComp = ref(false);
+
+  const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value;
+};
+  
+  const props = defineProps({
+    selectedWorkspace: {
+      type: String,
+      required: true
+    },
+    files: {
+      type: Array,
+      required: true
+    }
+  });
+  
+  const currentWorkspace = ref(props.selectedWorkspace);
+  const work_file = ref(props.files.map(file => file.name));
+  
+  watch(() => props.selectedWorkspace, (newValue) => {
     currentWorkspace.value = newValue;
-    console.log(currentWorkspace.value)
-
     btn_show.value = true;
     search_block.value = 0;
     showChart.value = false;
-});
-
-// 监听 props.files 的变化
-watch(() => props.files, (newFiles) => {
+  });
+  
+  watch(() => props.files, (newFiles) => {
     work_file.value = newFiles.map(file => file.name);
-
-    // 更新 localStorage 中的文件列表
-    // localStorage.setItem("file_lists", JSON.stringify(newFiles));
-
-    // 输出变化后的值
-    // console.log(f.value);
-    console.log(work_file.value);
-});
-
-const hidden_btn = () => {
+  });
+  
+  const hidden_btn = () => {
     btn_show.value = !btn_show.value;
     if (btn_show.value === true) search_block.value = 0;
     showChart.value = false;
-}
-
-const show_search = (index) => {
+  }
+  
+  const show_search = (index) => {
     search_block.value = index;
-}
-
-//根據年份區間做關鍵字分析
-//未完成部分: workspace資料抓取(先用fake)， 
-async function startAnalysis1() {
-    
+  }
+  
+  async function startAnalysis1() {
     const requestData = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-        //workspace和file抓你file那個vue的，未處理完成
-        workspace: currentWorkspace.value,
-        files: work_file.value,
-        start: startYear.value,
-        end: endYear.value
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
+      workspace: currentWorkspace.value,
+      files: work_file.value,
+      start: startYear.value,
+      end: endYear.value
     };
     try {
-        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/year', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-
-        const responseData = await response.json();
-        console.log(responseData)
-
+      const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/year', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+  
+      const responseData = await response.json();
+      console.log(responseData)
+  
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
-
-    //等待10秒
-    // await sleep(1000);
-
+  
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart1());
-}
-
-//根據關鍵字出現次數做分析（設定下限）
-//未完成部分: workspace資料抓取(先用fake)， 
-async function startAnalysis2() {
+    google.charts.setOnLoadCallback(drawChart1);
+  }
+  
+  async function startAnalysis2() {
     const requestData = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-        //workspace和file抓你file那個vue的，未處理完成
-        workspace: currentWorkspace.value,
-        files: work_file.value,
-        threshold: lower_limit.value
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
+      workspace: currentWorkspace.value,
+      files: work_file.value,
+      threshold: lower_limit.value
     };
-
+  
     try {
-        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/occurence', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-
-        const responseData = await response.json();
-        console.log(responseData)
-
+      const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/occurence', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+  
+      const responseData = await response.json();
+      console.log(responseData)
+  
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
-
-    //等待1秒
-    // await sleep(1000);
-
+  
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart1());
-}
-
-//根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢
-async function startAnalysis3() {
-    
+    google.charts.setOnLoadCallback(drawChart1);
+  }
+  
+  async function startAnalysis3() {
     const requestData = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-        //workspace和file抓你file那個vue的，未處理完成
-        workspace: currentWorkspace.value,
-        files: work_file.value,
-        keyword: single_key.value
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
+      workspace: currentWorkspace.value,
+      files: work_file.value,
+      keyword: single_key.value
     };
     try {
-        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/keyword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-
-        const responseData = await response.json();
-        console.log(responseData)
-
+      const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/keyword', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+  
+      const responseData = await response.json();
+      console.log(responseData)
+  
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
-
-    //等待1秒
-    // await sleep(1000);
-
+  
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart2());
-}
-
-//作者，年份區間
-async function startAnalysis4() {
-    
+    google.charts.setOnLoadCallback(drawChart2);
+  }
+  
+  async function startAnalysis4() {
     const requestData = {
-
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-        //workspace和file抓你file那個vue的，未處理完成
-        workspace: currentWorkspace.value,
-        files: work_file.value,
-        start: startYear.value,
-        end: endYear.value
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
+      workspace: currentWorkspace.value,
+      files: work_file.value,
+      start: startYear.value,
+      end: endYear.value
     };
     try {
-        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/authorAnalysis/year', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-
-        const responseData = await response.json();
-        console.log(responseData)
-
+      const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/authorAnalysis/year', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+  
+      const responseData = await response.json();
+      console.log(responseData)
+  
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
-
-    //等待1秒
-    // await sleep(1000);
-
+  
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart3());
-}
-
-//作者，引用次數
-async function startAnalysis5() {
-    
+    google.charts.setOnLoadCallback(drawChart3);
+  }
+  
+  async function startAnalysis5() {
     const requestData = {
-
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-        //workspace和file抓你file那個vue的，未處理完成
-        workspace: currentWorkspace.value,
-        files: work_file.value,
-        start: startYear.value,
-        end: endYear.value
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
+      workspace: currentWorkspace.value,
+      files: work_file.value,
+      start: startYear.value,
+      end: endYear.value
     };
     try {
-        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/referenceCountAnalysis/generalInfo', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-
-        const responseData = await response.json();
-        console.log(responseData)
-
+      const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/referenceCountAnalysis/generalInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+  
+      const responseData = await response.json();
+      console.log(responseData)
+  
     } catch (error) {
-        console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
-
-    //等待30秒，這個超久
-    // await sleep(2000);
-
+  
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart4());
-}
-
-async function get_results() {
+    google.charts.setOnLoadCallback(drawChart4);
+  }
+  
+  async function get_results() {
     const requestData = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
+      email: localStorage.getItem("email"),
+      password: localStorage.getItem("password"),
     };
     waitComp.value = true
     let maxRetries = 5;
     let attempt = 0;
-
+  
     while (attempt < maxRetries) {
-        try {
-            const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/getResult', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
-            });
-
-            if (!response.ok) {
-                throw new Error('API request failed');
-            }
-            waitComp.value = false; //等待畫面關閉
-            showChart.value = true; //圖表打開
-            const responseData = await response.json();
-            console.log(responseData)
-            return responseData;
-            // results_data = responseData;
-        } catch (error) {
-            // console.log(waitComp.value)
-            console.error('Error fetching data, retrying...', error);
-            attempt++;
-            await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒重試
+      try {
+        const response = await fetch('https://wos-data-analysis-backend.onrender.com/api/getResult', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
+  
+        if (!response.ok) {
+          throw new Error('API request failed');
         }
+        waitComp.value = false;
+        showChart.value = true;
+        const responseData = await response.json();
+        return responseData;
+      } catch (error) {
+        console.error('Error fetching data, retrying...', error);
+        attempt++;
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
     }
     waitComp.value = false;
     throw new Error('API request failed after maximum retries');
-}
-
-//用於年份區間和關鍵字出現次數(下限)
-//資料已獲取，但要如何呈現未定
-async function drawChart1() {
+  }
+  
+  async function drawChart1() {
     const result = await get_results();
-    console.log("1號在搞幹")
-    console.log(result)
     const topData = result.results.slice(0, 50);
-
+  
     const data = new google.visualization.DataTable();
     data.addColumn('string', 'Keyword');
     data.addColumn('number', 'Count');
-
+  
     const dataArray = topData.map(item => [item.keyword, item.count]);
     data.addRows(dataArray);
-
+  
     const options = {
-        title: 'Keyword Analysis',
-        legend: { position: 'none' }
+      title: 'Keyword Analysis',
+      legend: { position: 'none' }
     };
-
+  
     const chart = new google.visualization.ColumnChart(document.getElementById('chart'));
     chart.draw(data, options);
-}
-
-//折線圖，關鍵字成長趨勢
-async function drawChart2() {
+  }
+  
+  async function drawChart2() {
     const result = await get_results();
-    console.log("2號在搞幹")
-    console.log(result)
-
     const topData = result.results.slice(0, 50);
-    //   console.log(Object.entries(topData[0]))    之後再嘗試修改
-
+  
     const data = new google.visualization.DataTable();
     data.addColumn('number', 'Year');
     data.addColumn('number', 'Count');
-
+  
     const dataArray = topData.map(item => [item.year, item.count]);
     data.addRows(dataArray);
-
+  
     const options = {
-        title: 'Keyword Analysis',
-        legend: { position: 'none' },
-        hAxis: {
-            title: 'Year'
-        },
-        vAxis: {
-            title: 'Count'
-        }
+      title: 'Keyword Analysis',
+      legend: { position: 'none' },
+      hAxis: {
+        title: 'Year'
+      },
+      vAxis: {
+        title: 'Count'
+      }
     };
-
+  
     const chart = new google.visualization.LineChart(document.getElementById('chart'));
     chart.draw(data, options);
-}
-
-//年份區間內作者發表了幾篇
-//資料已獲取，但要如何呈現未定
-async function drawChart3() {
+  }
+  
+  async function drawChart3() {
     const result = await get_results();
-    console.log("3號在搞幹")
-    console.log(result)
     const topData = result.results.slice(0, 50);
-
+  
     const data = new google.visualization.DataTable();
     data.addColumn('string', 'author');
     data.addColumn('number', 'Count');
-
+  
     const dataArray = topData.map(item => [item.author, item.count]);
     data.addRows(dataArray);
-
+  
     const options = {
-        title: 'Keyword Analysis',
-        legend: { position: 'none' }
+      title: 'Keyword Analysis',
+      legend: { position: 'none' }
     };
-
+  
     const chart = new google.visualization.ColumnChart(document.getElementById('chart'));
     chart.draw(data, options);
-}
-
-async function drawChart4() {
+  }
+  
+  async function drawChart4() {
     const result = await get_results();
-    console.log("4號在搞幹")
-    // console.log(result)
     const topData = result.results.slice(0, 50);
-    // const topData= result.results;
-
-    console.log(topData)
   
     const data = new google.visualization.DataTable();
     data.addColumn('string', 'Title');
   
-    // 收集所有作者的名字，確保每個作者都有對應的列
     const authorsSet = new Set();
     topData.forEach(item => {
-        item.author.forEach(author => {
-            authorsSet.add(author);
-        });
+      item.author.forEach(author => {
+        authorsSet.add(author);
+      });
     });
   
-    // 添加每個作者作為列
     authorsSet.forEach(author => {
       data.addColumn('number', author);
     });
   
-    // 填充數據
     topData.forEach(item => {
-        const row = new Array(data.getNumberOfColumns()).fill(0);
-        row[0] = item.title;
-        item.author.forEach(author => {
-            const authorIndex = data.getColumnIndex(author);
-            row[authorIndex] = item.count / item.author.length; // 每個作者的貢獻
-        });
-        data.addRow(row);
+      const row = new Array(data.getNumberOfColumns()).fill(0);
+      row[0] = item.title;
+      item.author.forEach(author => {
+        const authorIndex = data.getColumnIndex(author);
+        row[authorIndex] = item.count / item.author.length;
+      });
+      data.addRow(row);
     });
   
     const options = {
-        title: 'Paper Citations by Authors',
-        isStacked: true,
-        hAxis: {
-            title: 'Title'
-        },
-        vAxis: {
-            title: 'Citations'
-        },
-        height: 500
+      title: 'Paper Citations by Authors',
+      isStacked: true,
+      hAxis: {
+        title: 'Title'
+      },
+      vAxis: {
+        title: 'Citations'
+      },
+      height: 500
     };
   
     const chart = new google.visualization.BarChart(document.getElementById('chart'));
     chart.draw(data, options);
-}
-
-
-//拿來延遲的
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-</script>
-
-<style scoped>
-.advance_page {
-    width: 70%;
-    margin-top: 50px;
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
   }
+  </script>
   
+  <style scoped>
+  .advanced-search {
+  width: 70%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.dropbtn {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropbtn:hover {
+  background-color: #555;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.btn-option {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
   .btn-group {
-    width: 100%;
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
+    flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    width: 100%;
   }
-  
-  .btn-option {
-    width: 45%;
-    background-color: #3B82F6;
-    color: white;
-    padding: 10px 20px;
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+
   
   .btn-option:hover {
-    background-color: #2563EB;
-}
-
-#btn-back {
-    width: 5%;
-    min-width: 75px;
+    background-color: #555;
   }
   
   .search-group {
@@ -574,51 +516,80 @@ function sleep(ms) {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.search-item {
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  }
+  
+  .search-item {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    text-align: center;
   }
   
   .search-item p {
-    margin-bottom: 10px;
     font-size: 16px;
     font-weight: bold;
   }
   
   .search-item label {
-    margin-bottom: 10px;
+    display: block;
+    margin: 10px 0;
   }
   
   .search-item input[type="number"],
   .search-item input[type="text"] {
-    padding: 5px;
-    border: 1px solid #D1D5DB;
-    border-radius: 5px;
-    margin-right: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    width: calc(100% - 22px);
+    border: 1px solid #ddd;
+    border-radius: 10px;
   }
   
-  .search-item input[type="button"] {
-    background-color: #3B82F6;
+  .search-item button {
+    background-color: #333;
     color: white;
     padding: 10px 20px;
+    margin-top: 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   
-  .search-item input[type="button"]:hover {
-    background-color: #2563EB;
+  .search-item button:hover {
+    background-color: #555;
   }
   
   .chart-show {
     width: 100%;
-    max-width: 1200px;
-    margin-top: 10px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 
+  .small-input {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid #D1D5DB;
+  border-radius: 5px;
+  margin-right: 10px;
 }
-</style>
+
+.search-item input[type="button"] {
+  background-color: #3B82F6;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-item input[type="button"]:hover {
+  background-color: #2563EB;
+}
+
+  </style>
+  

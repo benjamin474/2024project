@@ -1,34 +1,42 @@
 <!-- Filelist.vue -->
 
 <template>
-  <div class="file-list">
-    <h3>檔案列表</h3>
-    <ul class="files">
-      <li v-for="file in files" :key="file.name">
-        <a :href="file.url" target="_blank">{{ file.name }}</a>
+  <div class="file-list-wrapper">
+    <div class="file-list-icon" @click="toggleFileList">
+      <span v-if="!isExpanded">&#9776;</span>
+      <span v-else>&times;</span>
+    </div>
+    <div class="file-list" v-if="isExpanded">
+      <h3>檔案列表</h3>
+      <ul class="files">
+        <li v-for="file in files" :key="file.name">
+          <a :href="file.url" target="_blank">{{ file.name }}</a>
+          <input
+            type="checkbox"
+            v-if="deleteMode"
+            v-model="selectedFiles"
+            :value="file.name"
+          />
+        </li>
+      </ul>
+      <div class="upload-section">
         <input
-          type="checkbox"
-          v-if="deleteMode"
-          v-model="selectedFiles"
-          :value="file.name"
+          type="file"
+          @change="handleFileUpload"
+          ref="fileInput"
+          style="display: none"
+          multiple
         />
-      </li>
-    </ul>
-    <div class="upload-section">
-      <input
-        type="file"
-        @change="handleFileUpload"
-        ref="fileInput"
-        style="display: none"
-        multiple
-      />
-      <button @click="deleteMode ? confirmDelete() : triggerFileInput()">
-        {{ deleteMode ? "確認" : "上傳檔案" }}
-      </button>
-      <button @click="toggleDeleteMode">刪除</button>
+        <button @click="deleteMode ? confirmDelete() : triggerFileInput()">
+          {{ deleteMode ? "確認" : "上傳檔案" }}
+        </button>
+        <button @click="toggleDeleteMode">刪除</button>
+      </div>
     </div>
   </div>
 </template>
+
+
 
 <script>
 export default {
@@ -48,9 +56,13 @@ export default {
     return {
       deleteMode: false,
       selectedFiles: [],
+      isExpanded: false, // 新增的狀態變量，用來控制文件列表顯示
     };
   },
   methods: {
+    toggleFileList() {
+      this.isExpanded = !this.isExpanded;
+    },
     triggerFileInput() {
       this.$refs.fileInput.click();
     },
@@ -161,17 +173,40 @@ export default {
 </script>
 
 <style scoped>
+.file-list-wrapper {
+  position: fixed;
+  top: 18%; /* 调整为 header 底下 */
+  right: 20px;
+  z-index: 1000;
+}
+
+.file-list-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  transition: background-color 0.3s ease;
+}
+
+.file-list-icon:hover {
+  background-color: #555;
+}
+
 .file-list {
   width: 250px;
   max-height: 400px;
-  background-color: #333;
-  border: 1px solid #555;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
   border-radius: 10px;
   padding: 10px;
   box-sizing: border-box;
-  position: fixed;
-  top: 17%;
-  right: 20px;
+  margin-top: 10px; /* 适当调整 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -179,7 +214,7 @@ export default {
 
 h3 {
   margin: 0 0 10px 0;
-  color: #fff;
+  color: #333;
 }
 
 .files {
@@ -199,12 +234,12 @@ li {
 
 a {
   text-decoration: none;
-  color: #ccc;
+  color: #333;
 }
 
 a:hover {
   text-decoration: underline;
-  color: #fff;
+  color: #555;
 }
 
 .upload-section {
@@ -217,13 +252,15 @@ a:hover {
   padding: 5px 10px;
   font-size: 14px;
   cursor: pointer;
-  background-color: #555;
+  background-color: #333;
   color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
 }
 
 .upload-section button:hover {
-  background-color: #777;
+  background-color: #555;
 }
+
 </style>

@@ -232,9 +232,8 @@ export default {
 
 <style scoped>
 .project-list {
-  width: 100%;
-  min-width:250px;
-  margin-top:20px;
+  width: 250px;
+  
   height: 100%;
   border-right: 1px solid #ddd;
   padding: 10px;
