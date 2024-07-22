@@ -60,6 +60,11 @@ export default {
     };
   },
   methods: {
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    },
     toggleFileList() {
       this.isExpanded = !this.isExpanded;
     },
@@ -96,8 +101,7 @@ export default {
     },
     async uploadFiles(filesData) {
       const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
+        token: this.getCookie("token"),
         workspace: this.project.name,
         files: filesData,
       };
@@ -134,8 +138,7 @@ export default {
     },
     async confirmDelete() {
       const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
+        token: this.getCookie("token"),
         workspace: this.project.name,
         files: this.selectedFiles,
       };
@@ -262,5 +265,4 @@ a:hover {
 .upload-section button:hover {
   background-color: #555;
 }
-
 </style>

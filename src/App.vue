@@ -3,7 +3,10 @@
   <div id="app">
     <HeaderBar class="header-bar" />
     <div class="panel">
-      <Projectlist @select-project="setSelectedProject" @delete-success="refreshProjects"/>
+      <Projectlist
+        @select-project="setSelectedProject"
+        @delete-success="refreshProjects"
+      />
       <component
         :is="selectedComponent"
         :project="selectedProject"
@@ -56,6 +59,11 @@ export default {
     },
   },
   methods: {
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    },
     async setSelectedProject(project) {
       this.selectedProject = project;
       await this.fetchFiles(project.name);
@@ -68,8 +76,7 @@ export default {
     },
     async fetchFiles(workspaceName) {
       const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
+        token: this.getCookie("token"),
         workspace: workspaceName,
       };
 
@@ -136,7 +143,6 @@ export default {
   flex-direction: row;
   width: 100%;
   flex-grow: 1;
-
 }
 
 .file-list-container {

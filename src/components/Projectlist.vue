@@ -71,11 +71,18 @@ export default {
     await this.fetchWorkspaces();
   },
   methods: {
+    getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(";");
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == " ") c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    },
     async fetchWorkspaces() {
-      const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
-      };
+      const token = { token: this.getCookie("token") };
 
       try {
         const response = await fetch(
@@ -85,7 +92,7 @@ export default {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(token),
           }
         );
 
@@ -113,8 +120,7 @@ export default {
     async addProject() {
       if (this.newProjectName) {
         const data = {
-          email: localStorage.getItem("email"),
-          password: localStorage.getItem("password"),
+          token: this.getCookie("token"),
           name: this.newProjectName,
         };
 
@@ -150,9 +156,8 @@ export default {
       this.selectedProject = project;
 
       const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
         workspace: project.name,
+        token: this.getCookie("token"),
       };
 
       try {
@@ -169,9 +174,8 @@ export default {
 
         if (response.ok) {
           const result = await response.json();
-          project.files = result.files.length; // 更新项目的文件数量，簡體註解改一下好不好啊
+          project.files = result.files.length; // 更新项目的文件数量
           this.$emit("update-files", result.files);
-          // localStorage.setItem("file_lists",JSON.stringify(result.files)); //資料先放local,之後直接傳來
           console.log("工作區底下的檔案:", result.files);
         } else {
           console.error("獲取工作區檔案失敗", response.statusText);
@@ -192,9 +196,8 @@ export default {
     },
     async deleteProject() {
       const data = {
-        email: localStorage.getItem("email"),
-        password: localStorage.getItem("password"),
         workspace: this.projectToDelete,
+        token: this.getCookie("token"),
       };
 
       try {
@@ -233,7 +236,7 @@ export default {
 <style scoped>
 .project-list {
   width: 250px;
-  
+
   height: 100%;
   border-right: 1px solid #ddd;
   padding: 10px;
@@ -244,7 +247,6 @@ export default {
   position: relative;
   background-color: #f7f7f7;
   border-radius: 10px;
-  
 }
 
 ul {

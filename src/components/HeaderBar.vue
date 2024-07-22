@@ -1,5 +1,3 @@
-<!-- HeaderBar.vue -->
-
 <template>
   <div class="header-bar">
     <div class="title">
@@ -51,10 +49,8 @@ export default {
     };
   },
   mounted() {
-    // 檢查 localStorage 中是否有登入資訊
-    const storedEmail = localStorage.getItem("email");
-    const storedPassword = localStorage.getItem("password");
-    if (storedEmail && storedPassword) {
+    const token = this.getCookie("token");
+    if (token) {
       this.isLoggedIn = true;
     }
   },
@@ -108,7 +104,9 @@ export default {
 
         if (response.ok) {
           alert(`註冊成功: ${result.message}`);
+          this.setCookie("token", result.token, 7);
           this.hideModal();
+          window.location.reload(); // 重新整理頁面
         } else {
           throw new Error(result.message);
         }
@@ -139,11 +137,7 @@ export default {
         if (response.ok) {
           alert(`登入成功: ${result.message}`);
           this.isLoggedIn = true;
-
-          // 存儲到 localStorage
-          localStorage.setItem("email", result.email);
-          localStorage.setItem("password", result.password);
-
+          this.setCookie("token", result.token, 7);
           this.hideModal();
           window.location.reload(); // 重新整理頁面
         } else {
@@ -155,10 +149,29 @@ export default {
     },
     logout() {
       this.isLoggedIn = false;
-      localStorage.removeItem("email");
-      localStorage.removeItem("password");
+      this.deleteCookie("token");
       alert("已登出");
       window.location.reload(); // 重新整理頁面
+    },
+    setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    },
+    getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(";");
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == " ") c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    },
+    deleteCookie(name) {
+      document.cookie =
+        name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
   },
 };

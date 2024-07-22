@@ -62,6 +62,11 @@ export default {
     };
   },
   methods: {
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    },
     handleFiles(event) {
       this.files = Array.from(event.target.files);
       let filesData = [];
@@ -80,8 +85,7 @@ export default {
       if (this.files && this.files.length > 0) {
         if (this.filesData && this.filesData.length === this.files.length) {
           const data = {
-            email: localStorage.getItem("email"),
-            password: localStorage.getItem("password"),
+            token: this.getCookie("token"),
             workspace: this.project.name,
             files: this.filesData,
           };
