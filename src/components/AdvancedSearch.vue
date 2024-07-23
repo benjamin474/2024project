@@ -39,6 +39,27 @@
           "
           >根據引用次數做分析</a
         >
+        <a
+          @click="
+            hidden_btn();
+            show_search(6);
+          "
+          >根據年份區間做研究領域分析</a
+        >
+        <a
+          @click="
+            hidden_btn();
+            show_search(7);
+          "
+          >根據研究領域出現次數做分析</a
+        >
+        <a
+          @click="
+            hidden_btn();
+            show_search(8);
+          "
+          >研究領域每年的成長趨勢</a
+        >
       </div>
     </div>
     <button class="btn-option" @click="hidden_btn()" v-if="!btn_show">
@@ -103,6 +124,48 @@
       <div class="author-cite search-item" v-if="search_block === 5">
         <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
       </div>
+
+      <div class="field-year search-item" v-if="search_block === 6">
+        <p>根據年份區間做研究領域分析</p>
+        <label>
+            開始年:
+            <input type="number" v-model="startYear" class="small-input" />
+          </label>
+          <label>
+            結束年:
+            <input type="number" v-model="endYear" class="small-input" />
+          </label>
+        <input type="button" value="開始分析" @click="startAnalysis6()" />
+      </div>
+
+      <div class="field-occurrence search-item" v-if="search_block === 7">
+        <p>根據研究領域出現次數做分析（設定下限）</p>
+        <label>
+            最少出現次數(下限):
+            <input
+              type="number"
+              v-model="lower_limit"
+              @keyup.enter="startAnalysis7()"
+              class="small-input"
+            />
+          </label>
+        <input type="button" value="開始分析" @click="startAnalysis7()" />
+      </div>
+
+      <div class="single-field search-item" v-if="search_block === 8">
+        <p>根據研究領域做查詢，可觀察該研究領域每年的成長趨勢</p>
+        <label>
+          輸入關鍵字
+          <input
+            type="text"
+            v-model="single_field"
+            @keyup.enter="startAnalysis8()"
+            class="small-input"
+          />
+          <input type="button" value="開始分析" @click="startAnalysis8()" />
+        </label>
+      </div>
+
     </div>
 
     <div class="chart-show">
@@ -124,6 +187,7 @@ const startYear = ref(1950);
 const endYear = ref(2024);
 const lower_limit = ref(1);
 const single_key = ref("");
+const single_field = ref("");
 const showChart = ref(false);
 const waitComp = ref(false);
 
@@ -364,6 +428,118 @@ async function startAnalysis5() {
   google.charts.setOnLoadCallback(drawChart4);
 }
 
+//根據年份區間做研究領域分析
+async function startAnalysis6() {
+  const requestData = {
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
+    workspace: currentWorkspace.value,
+    files: work_file.value,
+    start: startYear.value,
+    end: endYear.value,
+  };
+  try {
+    const response = await fetch(
+      "https://wos-data-analysis-backend.onrender.com/api/fieldAnalysis/year",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("API request failed");
+    }
+
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart5);
+    // const result = await get_results();
+    // console.log(result)
+}
+
+//領域，下限次數
+async function startAnalysis7() {
+  const requestData = {
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
+    workspace: currentWorkspace.value,
+    files: work_file.value,
+    threshold: lower_limit.value,
+  };
+  try {
+    const response = await fetch(
+      "https://wos-data-analysis-backend.onrender.com/api/fieldAnalysis/occurence",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("API request failed");
+    }
+
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart5);
+}
+
+async function startAnalysis8() {
+  const requestData = {
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
+    workspace: currentWorkspace.value,
+    files: work_file.value,
+    field: single_field.value,
+  };
+  try {
+    const response = await fetch(
+      "https://wos-data-analysis-backend.onrender.com/api/fieldAnalysis/field",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("API request failed");
+    }
+
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart6);
+  // const result = await get_results();
+  // console.log(result)
+}
+
 //獲取資料區塊
 async function get_results() {
   const requestData = {
@@ -522,6 +698,59 @@ async function drawChart4() {
   );
   chart.draw(data, options);
 }
+
+async function drawChart5() {
+  const result = await get_results();
+  const topData = result.results.slice(0, 50);
+//   const topData = result.results.slice(0, 15);
+
+  const data = new google.visualization.DataTable();
+  data.addColumn("string", "Field");
+  data.addColumn("number", "Count");
+
+  const dataArray = topData.map((item) => [item.field, item.count]);
+  data.addRows(dataArray);
+
+  const options = {
+    title: "Field Analysis",
+    legend: { position: "none" },
+  };
+
+  const chart = new google.visualization.ColumnChart(
+    document.getElementById("chart")
+  );
+  chart.draw(data, options);
+}
+
+async function drawChart6() {
+  const result = await get_results();
+  const topData = result.results.slice(0, 50);
+
+  const data = new google.visualization.DataTable();
+  data.addColumn("number", "Year");
+  data.addColumn("number", "Count");
+
+  const dataArray = topData.map((item) => [item.year, item.count]);
+  data.addRows(dataArray);
+
+  const options = {
+    title: "Field Analysis",
+    legend: { position: "none" },
+    hAxis: {
+      title: "Year",
+    },
+    vAxis: {
+      title: "Count",
+    },
+  };
+
+  const chart = new google.visualization.LineChart(
+    document.getElementById("chart")
+  );
+  chart.draw(data, options);
+}
+
+
 </script>
   
   <style scoped>
