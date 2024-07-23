@@ -116,6 +116,7 @@
 import { ref, watch } from "vue";
 import { VueSpinnerHourglass } from "vue3-spinners";
 
+//前置資料
 const dropdownOpen = ref(false);
 const btn_show = ref(true);
 const search_block = ref(0);
@@ -171,10 +172,24 @@ const show_search = (index) => {
   search_block.value = index;
 };
 
+const getCookie = (name) => {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(";");
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == " ") c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    };
+// console.log(getCookie("token"))
+
+//功能開始
 async function startAnalysis1() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
@@ -208,8 +223,9 @@ async function startAnalysis1() {
 
 async function startAnalysis2() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     threshold: lower_limit.value,
@@ -243,8 +259,9 @@ async function startAnalysis2() {
 
 async function startAnalysis3() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     keyword: single_key.value,
@@ -277,8 +294,9 @@ async function startAnalysis3() {
 
 async function startAnalysis4() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
@@ -312,8 +330,9 @@ async function startAnalysis4() {
 
 async function startAnalysis5() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
@@ -345,10 +364,12 @@ async function startAnalysis5() {
   google.charts.setOnLoadCallback(drawChart4);
 }
 
+//獲取資料區塊
 async function get_results() {
   const requestData = {
-    email: localStorage.getItem("email"),
-    password: localStorage.getItem("password"),
+    // email: localStorage.getItem("email"),
+    // password: localStorage.getItem("password"),
+    token: getCookie("token")
   };
   waitComp.value = true;
   let maxRetries = 5;
