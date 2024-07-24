@@ -861,7 +861,7 @@ async function drawChart6() {
 }
 
 .search-item p {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: bold;
 }
 
