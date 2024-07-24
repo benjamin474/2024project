@@ -1,133 +1,76 @@
 <template>
   <div class="advanced-search">
-    <div class="dropdown">
-      <button class="dropbtn" @click="toggleDropdown">選擇分析功能</button>
-      <div class="dropdown-content" v-show="dropdownOpen">
-        <a
-          @click="
-            hidden_btn();
-            show_search(1);
-          "
-          >根據年份區間做關鍵字分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(2);
-          "
-          >根據關鍵字出現次數做分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(3);
-          "
-          >關鍵字成長趨勢</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(4);
-          "
-          >根據年份區間對作者分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(5);
-            startAnalysis5();
-          "
-          >根據引用次數做分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(6);
-          "
-          >根據年份區間做研究領域分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(7);
-          "
-          >根據研究領域出現次數做分析</a
-        >
-        <a
-          @click="
-            hidden_btn();
-            show_search(8);
-          "
-          >研究領域每年的成長趨勢</a
-        >
+    <div class="ads-top">
+      <div class="dropdown">
+        <button class="dropbtn" @click="toggleDropdown">選擇分析功能</button>
+        <div class="dropdown-content" v-show="dropdownOpen">
+          <a
+            @click="
+              hidden_btn();
+              show_search(1);
+            "
+            >根據年份區間做關鍵字分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(2);
+            "
+            >根據關鍵字出現次數做分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(3);
+            "
+            >關鍵字成長趨勢</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(4);
+            "
+            >根據年份區間對作者分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(5);
+              startAnalysis5();
+            "
+            >根據引用次數做分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(6);
+            "
+            >根據年份區間做研究領域分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(7);
+            "
+            >根據研究領域出現次數做分析</a
+          >
+          <a
+            @click="
+              hidden_btn();
+              show_search(8);
+            "
+            >研究領域每年的成長趨勢</a
+          >
+        </div>
       </div>
-    </div>
-    <button class="btn-option" @click="hidden_btn()" v-if="!btn_show">
-      返回
-    </button>
-
-    <div class="search-group">
-      <div class="year-keyword search-item" v-if="search_block === 1">
-        <p>請輸入年份區間，系統會顯示該區間之關鍵字及出現次數</p>
-        <label>
-          開始年:
-          <input type="number" v-model="startYear" class="small-input" />
-        </label>
-        <label>
-          結束年:
-          <input type="number" v-model="endYear" class="small-input" />
-        </label>
-        <input type="button" value="開始分析" @click="startAnalysis1()" />
-      </div>
-
-      <div class="occurence-keyword search-item" v-if="search_block === 2">
-        <p>根據關鍵字出現次數做分析，請輸入下限</p>
-        <label>
-          最少出現次數(下限):
-          <input
-            type="number"
-            v-model="lower_limit"
-            @keyup.enter="startAnalysis2()"
-            class="small-input"
-          />
-        </label>
-        <input type="button" value="開始分析" @click="startAnalysis2()" />
-      </div>
-
-      <div class="single-keyword search-item" v-if="search_block === 3">
-        <p>根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢</p>
-        <label>
-          輸入關鍵字
-          <input
-            type="text"
-            v-model="single_key"
-            @keyup.enter="startAnalysis3()"
-            class="small-input"
-          />
-          <input type="button" value="開始分析" @click="startAnalysis3()" />
-        </label>
-      </div>
-
-      <div class="year-author search-item" v-if="search_block === 4">
-        <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
-        <label>
-          開始年:
-          <input type="number" v-model="startYear" class="small-input" />
-        </label>
-        <label>
-          結束年:
-          <input type="number" v-model="endYear" class="small-input" />
-        </label>
-        <input type="button" value="開始分析" @click="startAnalysis4()" />
-      </div>
-
-      <div class="author-cite search-item" v-if="search_block === 5">
-        <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
-      </div>
-
-      <div class="field-year search-item" v-if="search_block === 6">
-        <p>根據年份區間做研究領域分析</p>
-        <label>
+      <!-- <button class="btn-option" @click="hidden_btn()" v-if="!btn_show">
+        返回
+      </button> -->
+  
+      <div class="search-group">
+        <div class="year-keyword search-item" v-if="search_block === 1">
+          <p>請輸入年份區間，系統會顯示該區間之關鍵字及出現次數</p>
+          <label>
             開始年:
             <input type="number" v-model="startYear" class="small-input" />
           </label>
@@ -135,38 +78,98 @@
             結束年:
             <input type="number" v-model="endYear" class="small-input" />
           </label>
-        <input type="button" value="開始分析" @click="startAnalysis6()" />
-      </div>
-
-      <div class="field-occurrence search-item" v-if="search_block === 7">
-        <p>根據研究領域出現次數做分析（設定下限）</p>
-        <label>
+          <input type="button" value="開始分析" @click="startAnalysis1()" />
+        </div>
+  
+        <div class="occurence-keyword search-item" v-if="search_block === 2">
+          <p>根據關鍵字出現次數做分析，請輸入下限</p>
+          <label>
             最少出現次數(下限):
             <input
               type="number"
               v-model="lower_limit"
-              @keyup.enter="startAnalysis7()"
+              @keyup.enter="startAnalysis2()"
               class="small-input"
             />
           </label>
-        <input type="button" value="開始分析" @click="startAnalysis7()" />
+          <input type="button" value="開始分析" @click="startAnalysis2()" />
+        </div>
+  
+        <div class="single-keyword search-item" v-if="search_block === 3">
+          <p>根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢</p>
+          <label>
+            輸入關鍵字
+            <input
+              type="text"
+              v-model="single_key"
+              @keyup.enter="startAnalysis3()"
+              class="small-input"
+            />
+            <input type="button" value="開始分析" @click="startAnalysis3()" />
+          </label>
+        </div>
+  
+        <div class="year-author search-item" v-if="search_block === 4">
+          <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
+          <label>
+            開始年:
+            <input type="number" v-model="startYear" class="small-input" />
+          </label>
+          <label>
+            結束年:
+            <input type="number" v-model="endYear" class="small-input" />
+          </label>
+          <input type="button" value="開始分析" @click="startAnalysis4()" />
+        </div>
+  
+        <div class="author-cite search-item" v-if="search_block === 5">
+          <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
+        </div>
+  
+        <div class="field-year search-item" v-if="search_block === 6">
+          <p>根據年份區間做研究領域分析</p>
+          <label>
+              開始年:
+              <input type="number" v-model="startYear" class="small-input" />
+            </label>
+            <label>
+              結束年:
+              <input type="number" v-model="endYear" class="small-input" />
+            </label>
+          <input type="button" value="開始分析" @click="startAnalysis6()" />
+        </div>
+  
+        <div class="field-occurrence search-item" v-if="search_block === 7">
+          <p>根據研究領域出現次數做分析（設定下限）</p>
+          <label>
+              最少出現次數(下限):
+              <input
+                type="number"
+                v-model="lower_limit"
+                @keyup.enter="startAnalysis7()"
+                class="small-input"
+              />
+            </label>
+          <input type="button" value="開始分析" @click="startAnalysis7()" />
+        </div>
+  
+        <div class="single-field search-item" v-if="search_block === 8">
+          <p>根據研究領域做查詢，可觀察該研究領域每年的成長趨勢</p>
+          <label>
+            輸入關鍵字
+            <input
+              type="text"
+              v-model="single_field"
+              @keyup.enter="startAnalysis8()"
+              class="small-input"
+            />
+            <input type="button" value="開始分析" @click="startAnalysis8()" />
+          </label>
+        </div>
+  
       </div>
-
-      <div class="single-field search-item" v-if="search_block === 8">
-        <p>根據研究領域做查詢，可觀察該研究領域每年的成長趨勢</p>
-        <label>
-          輸入關鍵字
-          <input
-            type="text"
-            v-model="single_field"
-            @keyup.enter="startAnalysis8()"
-            class="small-input"
-          />
-          <input type="button" value="開始分析" @click="startAnalysis8()" />
-        </label>
-      </div>
-
     </div>
+    
 
     <div class="chart-show">
       <div id="chart" v-if="showChart"></div>
@@ -595,6 +598,8 @@ async function drawChart1() {
   const options = {
     title: "Keyword Analysis",
     legend: { position: "none" },
+    width: '100%',
+    height: '100%'
   };
 
   const chart = new google.visualization.ColumnChart(
@@ -758,8 +763,16 @@ async function drawChart6() {
   width: 70%;
   margin: 20px auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content:center;
+  align-content:flex-start;
+}
+.ads-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items:center;
 }
 .dropdown {
   position: relative;
@@ -768,6 +781,7 @@ async function drawChart6() {
 }
 
 .dropbtn {
+  width: 120%;
   background-color: #333;
   color: white;
   padding: 10px 20px;
@@ -881,9 +895,15 @@ async function drawChart6() {
 }
 .chart-show {
   width: 100%;
+  height: 400px;
+  max-width: 1200px;
   margin-top: 20px;
   display: flex;
   justify-content: center;
+}
+#chart{
+  width: 100%;
+  height: 100%;
 }
 
 .small-input {
