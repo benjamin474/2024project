@@ -14,13 +14,6 @@
           <a
             @click="
               hidden_btn();
-              show_search(2);
-            "
-            >根據關鍵字出現次數做分析</a
-          >
-          <a
-            @click="
-              hidden_btn();
               show_search(3);
             "
             >關鍵字成長趨勢</a
@@ -36,7 +29,6 @@
             @click="
               hidden_btn();
               show_search(5);
-              startAnalysis5();
             "
             >根據引用次數做分析</a
           >
@@ -46,13 +38,6 @@
               show_search(6);
             "
             >根據年份區間做研究領域分析</a
-          >
-          <a
-            @click="
-              hidden_btn();
-              show_search(7);
-            "
-            >根據研究領域出現次數做分析</a
           >
           <a
             @click="
@@ -68,6 +53,7 @@
       </button> -->
   
       <div class="search-group">
+        <!-- 關鍵字，年份區間 -->
         <div class="year-keyword search-item" v-if="search_block === 1">
           <p>請輸入年份區間，系統會顯示該區間之關鍵字及出現次數</p>
           <label>
@@ -78,23 +64,20 @@
             結束年:
             <input type="number" v-model="endYear" class="small-input" />
           </label>
-          <input type="button" value="開始分析" @click="startAnalysis1()" />
-        </div>
-  
-        <div class="occurence-keyword search-item" v-if="search_block === 2">
-          <p>根據關鍵字出現次數做分析，請輸入下限</p>
           <label>
             最少出現次數(下限):
             <input
               type="number"
               v-model="lower_limit"
-              @keyup.enter="startAnalysis2()"
               class="small-input"
             />
           </label>
-          <input type="button" value="開始分析" @click="startAnalysis2()" />
+          <div>
+            <input type="button" value="開始分析" @click="startAnalysis_keywordYear()" />
+          </div>
         </div>
-  
+
+        <!-- 單一關鍵字 -->
         <div class="single-keyword search-item" v-if="search_block === 3">
           <p>根據關鍵字做查詢，可觀察該關鍵字每年的成長趨勢</p>
           <label>
@@ -102,13 +85,16 @@
             <input
               type="text"
               v-model="single_key"
-              @keyup.enter="startAnalysis3()"
+              @keyup.enter="startAnalysis_singleKeyword()"
               class="small-input"
             />
-            <input type="button" value="開始分析" @click="startAnalysis3()" />
           </label>
+          <div>
+            <input type="button" value="開始分析" @click="startAnalysis_singleKeyword()" />
+          </div>
         </div>
   
+        <!-- 作者 年份區間 -->
         <div class="year-author search-item" v-if="search_block === 4">
           <p>根據年份區間對作者做分析（看年份區間內作者發表了幾篇）</p>
           <label>
@@ -119,13 +105,35 @@
             結束年:
             <input type="number" v-model="endYear" class="small-input" />
           </label>
-          <input type="button" value="開始分析" @click="startAnalysis4()" />
+          <label>
+            最少出現次數(下限):
+            <input
+              type="number"
+              v-model="lower_limit"
+              class="small-input"
+            />
+          </label>
+          <div>
+            <input type="button" value="開始分析" @click="startAnalysis_yearAuthor()" />
+          </div>
         </div>
-  
+        <!-- 根據引用次數做分析（一併提供標題和作者資訊） -->
         <div class="author-cite search-item" v-if="search_block === 5">
           <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
+          <label>
+            最少出現次數(下限):
+            <input
+              type="number"
+              v-model="lower_limit"
+              class="small-input"
+            />
+          </label>
+          <div>
+            <input type="button" value="開始分析" @click="startAnalysis_author_cite()" />
+          </div>
         </div>
   
+        <!-- 領域 年份區間 -->
         <div class="field-year search-item" v-if="search_block === 6">
           <p>根據年份區間做研究領域分析</p>
           <label>
@@ -136,23 +144,19 @@
               結束年:
               <input type="number" v-model="endYear" class="small-input" />
             </label>
-          <input type="button" value="開始分析" @click="startAnalysis6()" />
-        </div>
-  
-        <div class="field-occurrence search-item" v-if="search_block === 7">
-          <p>根據研究領域出現次數做分析（設定下限）</p>
-          <label>
+            <label>
               最少出現次數(下限):
               <input
                 type="number"
                 v-model="lower_limit"
-                @keyup.enter="startAnalysis7()"
                 class="small-input"
               />
             </label>
-          <input type="button" value="開始分析" @click="startAnalysis7()" />
+            <div>
+              <input type="button" value="開始分析" @click="startAnalysis_fieldYear()" />
+            </div>
         </div>
-  
+        <!-- 單一領域成長趨勢 -->
         <div class="single-field search-item" v-if="search_block === 8">
           <p>根據研究領域做查詢，可觀察該研究領域每年的成長趨勢</p>
           <label>
@@ -160,20 +164,21 @@
             <input
               type="text"
               v-model="single_field"
-              @keyup.enter="startAnalysis8()"
+              @keyup.enter="startAnalysis_singleField()"
               class="small-input"
             />
-            <input type="button" value="開始分析" @click="startAnalysis8()" />
           </label>
+          <div>
+            <input type="button" value="開始分析" @click="startAnalysis_singleField()" />
+          </div>
         </div>
-  
       </div>
     </div>
-    
 
     <div class="chart-show">
       <div id="chart" v-if="showChart"></div>
       <VueSpinnerHourglass size="40px" color="blue" v-if="waitComp" />
+      <h3 v-if="waitComp">資料分析需要時間，請勿重複點擊開始分析</h3>
     </div>
   </div>
 </template>
@@ -193,6 +198,7 @@ const single_key = ref("");
 const single_field = ref("");
 const showChart = ref(false);
 const waitComp = ref(false);
+const subtitle = ref("");
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
@@ -252,15 +258,17 @@ const getCookie = (name) => {
 // console.log(getCookie("token"))
 
 //功能開始
-async function startAnalysis1() {
+//關鍵字，年份區間
+async function startAnalysis_keywordYear() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
     end: endYear.value,
+    threshold: lower_limit.value,
   };
   try {
     const response = await fetch(
@@ -277,57 +285,19 @@ async function startAnalysis1() {
     if (!response.ok) {
       throw new Error("API request failed");
     }
-
     const responseData = await response.json();
-    console.log(responseData);
+    // console.log(responseData);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart1);
+  drawChart1();
 }
 
-async function startAnalysis2() {
+
+async function startAnalysis_singleKeyword() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
-    token: getCookie("token"),
-    workspace: currentWorkspace.value,
-    files: work_file.value,
-    threshold: lower_limit.value,
-  };
-
-  try {
-    const response = await fetch(
-      "https://wos-data-analysis-backend.onrender.com/api/keywordAnalysis/occurence",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("API request failed");
-    }
-
-    const responseData = await response.json();
-    console.log(responseData);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart1);
-}
-
-async function startAnalysis3() {
-  const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
@@ -350,24 +320,24 @@ async function startAnalysis3() {
     }
 
     const responseData = await response.json();
-    console.log(responseData);
+    // console.log(responseData);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart2);
+  drawChart2();
 }
 
-async function startAnalysis4() {
+async function startAnalysis_yearAuthor() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
     end: endYear.value,
+    threshold: lower_limit.value,
   };
   try {
     const response = await fetch(
@@ -384,26 +354,22 @@ async function startAnalysis4() {
     if (!response.ok) {
       throw new Error("API request failed");
     }
-
     const responseData = await response.json();
     console.log(responseData);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart3);
+  drawChart3();
 }
 
-async function startAnalysis5() {
+async function startAnalysis_author_cite() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
-    start: startYear.value,
-    end: endYear.value,
+    threshold: lower_limit.value,
   };
   try {
     const response = await fetch(
@@ -426,21 +392,20 @@ async function startAnalysis5() {
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart4);
+  drawChart4();
 }
 
 //根據年份區間做研究領域分析
-async function startAnalysis6() {
+async function startAnalysis_fieldYear() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
     start: startYear.value,
     end: endYear.value,
+    threshold: lower_limit.value
   };
   try {
     const response = await fetch(
@@ -464,52 +429,16 @@ async function startAnalysis6() {
     console.error("Error fetching data:", error);
   }
 
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart5);
+  drawChart_fieldYear();
     // const result = await get_results();
     // console.log(result)
 }
 
-//領域，下限次數
-async function startAnalysis7() {
+//領域 單一
+async function startAnalysis_singleField() {
+  showChart.value = false; //預處理，避免上一個圖表還在
+  const refresh = get_results(1);
   const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
-    token: getCookie("token"),
-    workspace: currentWorkspace.value,
-    files: work_file.value,
-    threshold: lower_limit.value,
-  };
-  try {
-    const response = await fetch(
-      "https://wos-data-analysis-backend.onrender.com/api/fieldAnalysis/occurence",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("API request failed");
-    }
-
-    const responseData = await response.json();
-    console.log(responseData);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart5);
-}
-
-async function startAnalysis8() {
-  const requestData = {
-    // email: localStorage.getItem("email"),
-    // password: localStorage.getItem("password"),
     token: getCookie("token"),
     workspace: currentWorkspace.value,
     files: work_file.value,
@@ -537,23 +466,38 @@ async function startAnalysis8() {
     console.error("Error fetching data:", error);
   }
 
-  google.charts.load("current", { packages: ["corechart"] });
-  google.charts.setOnLoadCallback(drawChart6);
-  // const result = await get_results();
-  // console.log(result)
+  drawChart_singleField();
+}
+
+//物件比較函式
+function shallowEqual(obj1, obj2) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    for (let key of keys1) {
+        if (obj1[key] !== obj2[key]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 //獲取資料區塊
-async function get_results() {
+async function get_results(max_r) {
+  // console.log(api_check,d.files)
   const requestData = {
     // email: localStorage.getItem("email"),
     // password: localStorage.getItem("password"),
     token: getCookie("token")
   };
   waitComp.value = true;
-  let maxRetries = 5;
+  let maxRetries = max_r;
   let attempt = 0;
-
   while (attempt < maxRetries) {
     try {
       const response = await fetch(
@@ -570,49 +514,59 @@ async function get_results() {
       if (!response.ok) {
         throw new Error("API request failed");
       }
+      const responseData = await response.json();
       waitComp.value = false;
       showChart.value = true;
-      const responseData = await response.json();
       return responseData;
     } catch (error) {
-      console.error("Error fetching data, retrying...", error);
+      console.error("Error fetching data, retrying...", error.response);
       attempt++;
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }
+  //最終失敗處理
   waitComp.value = false;
   throw new Error("API request failed after maximum retries");
 }
 
 async function drawChart1() {
-  const result = await get_results();
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
+  //子標題無法使用
+  const request = result.request;
+  const subt ="Lower limit: " + request.threshold + ", " + request.start + "~" +request.end
 
-  const data = new google.visualization.DataTable();
-  data.addColumn("string", "Keyword");
-  data.addColumn("number", "Count");
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{
+    const data = new google.visualization.DataTable();
+    data.addColumn("string", "Keyword");
+    data.addColumn("number", "Count");
 
-  const dataArray = topData.map((item) => [item.keyword, item.count]);
-  data.addRows(dataArray);
+    const dataArray = topData.map((item) => [item.keyword, item.count]);
+    data.addRows(dataArray);
 
-  const options = {
-    title: "Keyword Analysis",
-    legend: { position: "none" },
-    width: '100%',
-    height: '100%'
-  };
+    const options = {
+      title: "Keyword Analysis",
+      legend: { position: "none" },
+      vAxis: { title: 'Year' },
+      hAxis: { title: 'Keyword' },
+      width: '100%',
+      height: '100%'
+    };
 
-  const chart = new google.visualization.ColumnChart(
-    document.getElementById("chart")
-  );
-  chart.draw(data, options);
+    const chart = new google.visualization.ColumnChart(
+      document.getElementById("chart")
+    );
+    chart.draw(data, options);
+  });
 }
 
 async function drawChart2() {
-  const result = await get_results();
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
-
-  const data = new google.visualization.DataTable();
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{
+    const data = new google.visualization.DataTable();
   data.addColumn("number", "Year");
   data.addColumn("number", "Count");
 
@@ -634,125 +588,153 @@ async function drawChart2() {
     document.getElementById("chart")
   );
   chart.draw(data, options);
+  });
 }
 
 async function drawChart3() {
-  const result = await get_results();
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
 
-  const data = new google.visualization.DataTable();
-  data.addColumn("string", "author");
-  data.addColumn("number", "Count");
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{
+    const data = new google.visualization.DataTable();
+    data.addColumn("string", "Author");
+    data.addColumn("number", "Count");
 
-  const dataArray = topData.map((item) => [item.author, item.count]);
-  data.addRows(dataArray);
+    const dataArray = topData.map((item) => [item.author, item.count]);
+    data.addRows(dataArray);
 
-  const options = {
-    title: "Keyword Analysis",
-    legend: { position: "none" },
-  };
-
-  const chart = new google.visualization.ColumnChart(
-    document.getElementById("chart")
-  );
-  chart.draw(data, options);
+    const options = {
+      title: "Keyword Analysis",
+      legend: { position: "none" },
+      hAxis: {
+        title: "Author",
+      },
+      vAxis: {
+        title: "Count",
+      },
+    };
+    const chart = new google.visualization.ColumnChart(
+      document.getElementById("chart")
+    );
+    chart.draw(data, options);
+  })
 }
 
 async function drawChart4() {
-  const result = await get_results();
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{ 
+    const data = new google.visualization.DataTable();
+    data.addColumn("string", "Title");
 
-  const data = new google.visualization.DataTable();
-  data.addColumn("string", "Title");
-
-  const authorsSet = new Set();
-  topData.forEach((item) => {
-    item.author.forEach((author) => {
-      authorsSet.add(author);
+    const authorsSet = new Set();
+    topData.forEach((item) => {
+      item.author.forEach((author) => {
+        authorsSet.add(author);
+      });
     });
-  });
 
-  authorsSet.forEach((author) => {
-    data.addColumn("number", author);
-  });
-
-  topData.forEach((item) => {
-    const row = new Array(data.getNumberOfColumns()).fill(0);
-    row[0] = item.title;
-    item.author.forEach((author) => {
-      const authorIndex = data.getColumnIndex(author);
-      row[authorIndex] = item.count / item.author.length;
+    authorsSet.forEach((author) => {
+      data.addColumn("number", author);
     });
-    data.addRow(row);
-  });
 
-  const options = {
-    title: "Paper Citations by Authors",
-    isStacked: true,
-    hAxis: {
-      title: "Title",
-    },
-    vAxis: {
-      title: "Citations",
-    },
-    height: 500,
-  };
+    topData.forEach((item) => {
+      const row = new Array(data.getNumberOfColumns()).fill(0);
+      row[0] = item.title;
+      item.author.forEach((author) => {
+        const authorIndex = data.getColumnIndex(author);
+        row[authorIndex] = item.count / item.author.length;
+      });
+      data.addRow(row);
+    });
 
-  const chart = new google.visualization.BarChart(
-    document.getElementById("chart")
-  );
-  chart.draw(data, options);
+    const options = {
+      title: "Paper Citations by Authors",
+      isStacked: true,
+      hAxis: {
+        title: "Title",
+      },
+      vAxis: {
+        title: "Citations",
+      },
+      height: "100%",
+      width: "100%"
+    };
+
+    const chart = new google.visualization.BarChart(
+      document.getElementById("chart")
+    );
+    chart.draw(data, options);
+    });
 }
 
-async function drawChart5() {
-  const result = await get_results();
+async function drawChart_fieldYear() {
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
 //   const topData = result.results.slice(0, 15);
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{ 
+    const data = new google.visualization.DataTable();
+    data.addColumn("string", "Field");
+    data.addColumn("number", "Count");
 
-  const data = new google.visualization.DataTable();
-  data.addColumn("string", "Field");
-  data.addColumn("number", "Count");
+    const dataArray = topData.map((item) => [item.field, item.count]);
+    data.addRows(dataArray);
 
-  const dataArray = topData.map((item) => [item.field, item.count]);
-  data.addRows(dataArray);
+    const options = {
+      title: "Field Analysis",
+      legend: { position: "none" },
+      hAxis: {
+        title: "Field",
+      },
+      vAxis: {
+        title: "Count",
+      },
+      height: "100%",
+      width: "100%"
+    };
 
-  const options = {
-    title: "Field Analysis",
-    legend: { position: "none" },
-  };
-
-  const chart = new google.visualization.ColumnChart(
-    document.getElementById("chart")
-  );
-  chart.draw(data, options);
+    const chart = new google.visualization.ColumnChart(
+      document.getElementById("chart")
+    );
+    chart.draw(data, options);
+  });
 }
 
-async function drawChart6() {
-  const result = await get_results();
+async function drawChart_singleField() {
+  const result = await get_results(10);
   const topData = result.results.slice(0, 50);
 
-  const data = new google.visualization.DataTable();
-  data.addColumn("number", "Year");
-  data.addColumn("number", "Count");
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(async () =>{ 
+    const data = new google.visualization.DataTable();
+    data.addColumn("number", "Year");
+    data.addColumn("number", "Count");
 
-  const dataArray = topData.map((item) => [item.year, item.count]);
-  data.addRows(dataArray);
+    const dataArray = topData.map((item) => [item.year, item.count]);
+    data.addRows(dataArray);
 
-  const options = {
-    title: "Field Analysis",
-    legend: { position: "none" },
-    hAxis: {
-      title: "Year",
-    },
-    vAxis: {
-      title: "Count",
-    },
-  };
+    const options = {
+      title: "Field Analysis",
+      legend: { position: "none" },
+      hAxis: {
+        title: "Year",
+      },
+      vAxis: {
+        title: "Count",
+      },
+      height: "100%",
+      width: "100%"
+    };
 
-  const chart = new google.visualization.LineChart(
-    document.getElementById("chart")
-  );
-  chart.draw(data, options);
+    const chart = new google.visualization.LineChart(
+      document.getElementById("chart")
+    );
+    chart.draw(data, options);
+  });
+  
 }
 
 
@@ -904,6 +886,10 @@ async function drawChart6() {
 #chart{
   width: 100%;
   height: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
 }
 
 .small-input {
