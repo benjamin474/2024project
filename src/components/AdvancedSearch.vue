@@ -119,9 +119,9 @@
         </div>
         <!-- 根據引用次數做分析（一併提供標題和作者資訊） -->
         <div class="author-cite search-item" v-if="search_block === 5">
-          <p>根據引用次數做分析（看年份區間內作者發表了幾篇）</p>
+          <p>根據引用次數做分析（一併提供標題和作者資訊）</p>
           <label>
-            最少出現次數(下限):
+            被引用最少次數(下限):
             <input
               type="number"
               v-model="lower_limit"
@@ -548,8 +548,8 @@ async function drawChart1() {
     const options = {
       title: "Keyword Analysis",
       legend: { position: "none" },
-      vAxis: { title: 'Year' },
-      hAxis: { title: 'Keyword' },
+      vAxis: { title: 'Count' },
+      hAxis: { title: 'Year' },
       width: '100%',
       height: '100%'
     };
@@ -594,7 +594,7 @@ async function drawChart2() {
 async function drawChart3() {
   const result = await get_results(10);
   const topData = result.results.slice(0, 50);
-
+  
   google.charts.load("current", { packages: ["corechart"] });
   google.charts.setOnLoadCallback(async () =>{
     const data = new google.visualization.DataTable();
@@ -605,7 +605,7 @@ async function drawChart3() {
     data.addRows(dataArray);
 
     const options = {
-      title: "Keyword Analysis",
+      title: "Author Analysis",
       legend: { position: "none" },
       hAxis: {
         title: "Author",
