@@ -104,9 +104,8 @@ export default {
 
         if (response.ok) {
           alert(`註冊成功: ${result.message}`);
-          this.setCookie("token", result.token, 7);
           this.hideModal();
-          window.location.reload(); // 重新整理頁面
+          // window.location.reload(); // 重新整理頁面
         } else {
           throw new Error(result.message);
         }
