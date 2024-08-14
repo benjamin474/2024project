@@ -12,13 +12,14 @@
       <button v-if="isLoggedIn" @click="logout">登出</button>
     </div>
 
-    <!-- 登入 Modal -->
+    <!-- 登入與忘記密碼 Modal -->
     <div v-if="isLoginModalVisible" class="modal-overlay" @click="hideModal">
       <div class="modal-content" @click.stop>
         <h2>登入</h2>
         <input type="email" v-model="loginEmail" placeholder="電子郵件" />
         <input type="password" v-model="loginPassword" placeholder="密碼" />
         <button @click="login">登入</button>
+        <a href="#" @click="forgotPassword">忘記密碼？</a>
       </div>
     </div>
 
@@ -105,7 +106,6 @@ export default {
         if (response.ok) {
           alert(`註冊成功: ${result.message}`);
           this.hideModal();
-          // window.location.reload(); // 重新整理頁面
         } else {
           throw new Error(result.message);
         }
@@ -144,6 +144,40 @@ export default {
         }
       } catch (error) {
         alert(`登入失敗: ${error.message}`);
+      }
+    },
+    async forgotPassword() {
+      if (!this.validateEmail(this.loginEmail)) {
+        alert("請輸入有效的電子郵件地址");
+        return;
+      }
+
+      const userData = {
+        email: this.loginEmail,
+      };
+
+      try {
+        const response = await fetch(
+          "https://wos-data-analysis-backend.onrender.com/api/auth/forgotPassword",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(`已寄送重設密碼的信件至該信箱: ${result.message}`);
+          this.hideModal();
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        alert(`重設密碼信件寄出失敗: ${error.message}`);
       }
     },
     logout() {
@@ -256,20 +290,28 @@ export default {
 .modal-content input {
   display: block;
   width: calc(100% - 20px);
-  margin: 10px auto;
+  margin-bottom: 10px;
   padding: 10px;
+  font-size: 16px;
 }
 
 .modal-content button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background-color: #e74c3c;
+  background-color: #333;
   color: #fff;
+  padding: 10px 20px;
   border: none;
   cursor: pointer;
+  width: 100%;
 }
 
-.modal-content button:hover {
-  background-color: #c0392b;
+.modal-content a {
+  display: block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.modal-content a:hover {
+  text-decoration: underline;
 }
 </style>

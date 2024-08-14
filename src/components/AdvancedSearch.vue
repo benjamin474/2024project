@@ -549,7 +549,9 @@ async function drawChart1() {
       title: "Keyword Analysis",
       legend: { position: "none" },
       vAxis: { title: 'Count' },
-      hAxis: { title: 'Year' },
+      hAxis: { title: 'Year',
+              format: '####',
+       },
       width: '100%',
       height: '100%'
     };
@@ -578,6 +580,7 @@ async function drawChart2() {
     legend: { position: "none" },
     hAxis: {
       title: "Year",
+      format: '####'
     },
     vAxis: {
       title: "Count",
@@ -721,6 +724,7 @@ async function drawChart_singleField() {
       legend: { position: "none" },
       hAxis: {
         title: "Year",
+        format: '####'
       },
       vAxis: {
         title: "Count",
