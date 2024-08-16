@@ -531,10 +531,10 @@ async function get_results(max_r) {
 
 async function drawChart1() {
   const result = await get_results(10);
-  const topData = result.results.slice(0, 50);
+  const topData = result.results.slice(1, 50); //省略最大第一筆
   //子標題無法使用
-  const request = result.request;
-  const subt ="Lower limit: " + request.threshold + ", " + request.start + "~" +request.end
+  // const request = result.request;
+  // const subt ="Lower limit: " + request.threshold + ", " + request.start + "~" +request.end
 
   google.charts.load("current", { packages: ["corechart"] });
   google.charts.setOnLoadCallback(async () =>{
@@ -549,9 +549,7 @@ async function drawChart1() {
       title: "Keyword Analysis",
       legend: { position: "none" },
       vAxis: { title: 'Count' },
-      hAxis: { title: 'Year',
-              format: '####',
-       },
+      hAxis: { title: 'Keywords' },
       width: '100%',
       height: '100%'
     };
@@ -565,7 +563,7 @@ async function drawChart1() {
 
 async function drawChart2() {
   const result = await get_results(10);
-  const topData = result.results.slice(0, 50);
+  const topData = result.results;
   google.charts.load("current", { packages: ["corechart"] });
   google.charts.setOnLoadCallback(async () =>{
     const data = new google.visualization.DataTable();
@@ -580,8 +578,12 @@ async function drawChart2() {
     legend: { position: "none" },
     hAxis: {
       title: "Year",
-      format: '####'
+      format: '####',  // Ensures the year is displayed without decimals
+      gridlines: {
+        count: data.getNumberOfRows() / 2,  // Ensures gridlines match the number of data points
+      },
     },
+    pointSize: 5,
     vAxis: {
       title: "Count",
     },
@@ -596,7 +598,7 @@ async function drawChart2() {
 
 async function drawChart3() {
   const result = await get_results(10);
-  const topData = result.results.slice(0, 50);
+  const topData = result.results.slice(0, 100);
   
   google.charts.load("current", { packages: ["corechart"] });
   google.charts.setOnLoadCallback(async () =>{
@@ -690,7 +692,7 @@ async function drawChart_fieldYear() {
       title: "Field Analysis",
       legend: { position: "none" },
       hAxis: {
-        title: "Field",
+        title: "Fields",
       },
       vAxis: {
         title: "Count",
@@ -724,8 +726,12 @@ async function drawChart_singleField() {
       legend: { position: "none" },
       hAxis: {
         title: "Year",
-        format: '####'
+        format: '####',  // Ensures the year is displayed without decimals
+        gridlines: {
+          count: data.getNumberOfRows() / 2,  // Ensures gridlines match the number of data points
+        },
       },
+      pointSize: 5,
       vAxis: {
         title: "Count",
       },
@@ -740,7 +746,6 @@ async function drawChart_singleField() {
   });
   
 }
-
 
 </script>
   
@@ -878,6 +883,11 @@ async function drawChart_singleField() {
 
 .search-item button:hover {
   background-color: #555;
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .chart-show {
   width: 100%;
